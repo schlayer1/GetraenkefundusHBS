@@ -10,8 +10,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- QR Code Library for Fridge Sign -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <!-- jsPDF and AutoTable for clean PDF reports -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 
   <script>
     tailwind.config = {
@@ -66,20 +67,6 @@
       background: #C2DADB;
       border-radius: 9999px;
     }
-    @media print {
-      body * {
-        visibility: hidden;
-      }
-      #print-area, #print-area * {
-        visibility: visible;
-      }
-      #print-area {
-        position: absolute;
-        left: 0;
-        top: 0;
-        width: 100%;
-      }
-    }
   </style>
 </head>
 <body class="min-h-screen flex flex-col font-sans selection:bg-peach selection:text-aqua-900 pb-16 md:pb-6">
@@ -96,12 +83,6 @@
         </div>
       </div>
       <div class="flex items-center space-x-2">
-        <button id="qr-trigger-btn" class="text-xs bg-aqua-600 hover:bg-aqua-700 text-peach-100 px-3 py-1.5 rounded-lg font-medium flex items-center gap-1.5 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-          </svg>
-          <span class="hidden sm:inline">QR-Code Schild</span>
-        </button>
         <button id="admin-header-btn" onclick="toggleAdminMode()" class="text-xs bg-peach text-aqua-900 hover:bg-peach-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-xs">
           <span id="admin-lock-icon">🔒</span>
           <span id="admin-header-text">Admin-Bereich</span>
@@ -133,7 +114,7 @@
       <div class="bg-peach-100 border border-peach-300 rounded-2xl p-3.5 flex items-start gap-3 shadow-xs">
         <span class="text-xl">💡</span>
         <div class="text-xs text-aqua-900 leading-relaxed">
-          <strong>Getränk entnommen?</strong> Wähle dein Getränk aus, gib deinen Namen oder dein Kürzel an und tippe auf <em>"Entnahme buchen"</em>. Danke für deine Mithilfe!
+          <strong>Getränk entnommen?</strong> Bitte wähle dein Getränk aus, trage deinen Namen ein (z. B. <em>Frau Schmidt</em> oder <em>Herr Weber</em>) und tippe auf <em>"Entnahme buchen"</em>. Vielen Dank!
         </div>
       </div>
 
@@ -144,10 +125,10 @@
           <!-- Colleague Name Input -->
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-2">
-              Wer bist du? (Name / Kürzel)
+              Wer bist du? (Bitte Namen eingeben)
             </label>
             <div class="space-y-2">
-              <input type="text" id="user-name" required placeholder="z. B. Herr Müller oder MÜL" autocomplete="name"
+              <input type="text" id="user-name" required placeholder="z. B. Frau Schmidt, Herr Weber oder Herr Müller" autocomplete="name"
                 class="w-full px-4 py-3 rounded-xl border-2 border-aqua-200 focus:border-aqua focus:outline-none text-base font-semibold text-aqua-900 placeholder:text-gray-400 bg-white transition shadow-sm">
               <!-- Quick Select Buttons for Frequent Colleagues -->
               <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs custom-scrollbar">
@@ -227,6 +208,46 @@
           </div>
 
         </form>
+      </div>
+
+      <!-- Öffentlich einsehbare Buchungshistorie für das Kollegium -->
+      <div class="bg-white rounded-3xl p-5 md:p-6 shadow-md border border-aqua-100 space-y-4">
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+          <div>
+            <h3 class="text-base font-bold text-aqua-900 flex items-center gap-2">
+              <span>📜</span>
+              <span>Buchungshistorie & Offene Beträge</span>
+            </h3>
+            <p class="text-xs text-aqua-600">Sieh nach, was du bisher entnommen hast oder filtere gezielt nach deinem Namen.</p>
+          </div>
+          <div class="w-full sm:w-auto">
+            <input type="text" id="public-log-search" oninput="renderPublicHistoryLog()" placeholder="Nach Name suchen..."
+              class="w-full sm:w-56 text-xs px-3 py-2 rounded-xl border border-aqua-200 focus:outline-none focus:border-aqua bg-aqua-50/30">
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs text-aqua-900">
+            <thead class="bg-aqua-50 text-aqua-800 uppercase font-bold text-[10px] tracking-wider border-b border-aqua-100">
+              <tr>
+                <th class="py-2.5 px-3 rounded-l-lg">Datum / Uhrzeit</th>
+                <th class="py-2.5 px-3">Kollege/in</th>
+                <th class="py-2.5 px-3">Getränk</th>
+                <th class="py-2.5 px-3 text-center">Menge</th>
+                <th class="py-2.5 px-3 text-right">Summe</th>
+                <th class="py-2.5 px-3 text-center rounded-r-lg">Status</th>
+              </tr>
+            </thead>
+            <tbody id="public-history-table-body" class="divide-y divide-gray-100 font-medium">
+              <!-- Dynamisch durch renderPublicHistoryLog() gefüllt -->
+            </tbody>
+          </table>
+        </div>
+
+        <div id="public-empty-log-state" class="hidden py-8 text-center text-gray-400">
+          <div class="text-3xl mb-1">📭</div>
+          <p class="text-xs">Noch keine Buchungen vorhanden.</p>
+        </div>
       </div>
     </section>
 
@@ -342,12 +363,20 @@
               <h3 class="text-base font-bold text-aqua-900">Wer schuldet wie viel?</h3>
               <p class="text-xs text-aqua-600">Übersicht pro Kollegin / Kollege mit Zahlungsstatus</p>
             </div>
-            <button onclick="exportCSV()" class="text-xs bg-aqua-50 hover:bg-aqua-100 text-aqua-800 font-semibold px-3 py-1.5 rounded-xl border border-aqua-200 flex items-center gap-1">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-              </svg>
-              <span>Abrechnung als CSV herunterladen</span>
-            </button>
+            <div class="flex flex-wrap items-center gap-2">
+              <button onclick="exportPDF()" class="text-xs bg-peach text-aqua-900 hover:bg-peach-300 font-bold px-3 py-1.5 rounded-xl border border-peach-300 flex items-center gap-1.5 transition shadow-xs">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                </svg>
+                <span>Abrechnung als PDF erstellen</span>
+              </button>
+              <button onclick="exportCSV()" class="text-xs bg-aqua-50 hover:bg-aqua-100 text-aqua-800 font-semibold px-3 py-1.5 rounded-xl border border-aqua-200 flex items-center gap-1 transition">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                <span>CSV</span>
+              </button>
+            </div>
           </div>
 
           <div id="colleagues-balances" class="space-y-2">
@@ -398,57 +427,6 @@
       </div>
     </section>
   </main>
-
-  <div id="qr-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-aqua-200 relative overflow-hidden">
-      <button onclick="closeQrModal()" class="absolute top-4 right-4 text-gray-400 hover:text-aqua-900 p-1 rounded-full">
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-
-      <!-- Printable Area -->
-      <div id="print-area" class="text-center">
-        <div class="inline-block bg-peach-100 text-aqua-800 px-3 py-1 rounded-full text-xs font-bold mb-2">
-          Lehrerzimmer Getränkefundus
-        </div>
-        <h2 class="text-2xl font-extrabold text-aqua-900 mb-1">Getränk entnommen?</h2>
-        <p class="text-xs text-aqua-700 mb-4">Einfach QR-Code scannen und Flasche in Sekunden eintragen!</p>
-
-        <!-- QR Code Canvas Container -->
-        <div class="p-4 bg-peach-50 rounded-2xl border-2 border-dashed border-peach-300 inline-block mb-4">
-          <div id="qrcode" class="flex justify-center"></div>
-        </div>
-
-        <div class="bg-aqua-50 p-3 rounded-xl border border-aqua-100 text-left text-xs text-aqua-800 space-y-1 mb-5">
-          <div class="flex items-center gap-2">
-            <span class="text-peach-400 font-bold text-sm">✓</span>
-            <span>Keine App-Installation notwendig</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-peach-400 font-bold text-sm">✓</span>
-            <span>Öffnet sich direkt im Smartphone-Browser</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-peach-400 font-bold text-sm">✓</span>
-            <span>Faire Abrechnung für die Kolleg:innen</span>
-          </div>
-        </div>
-      </div>
-
-      <div class="flex gap-2">
-        <button onclick="window.print()" class="flex-1 py-3 bg-aqua hover:bg-aqua-500 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition">
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-          </svg>
-          Schild drucken (für Kühlschrank)
-        </button>
-        <button onclick="closeQrModal()" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-xs transition">
-          Schließen
-        </button>
-      </div>
-    </div>
-  </div>
 
   <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-aqua-900 text-peach-100 px-5 py-3 rounded-2xl shadow-xl border border-peach flex items-center gap-3 transition-all duration-300 opacity-0 pointer-events-none translate-y-5 z-50">
     <span class="text-xl" id="toast-icon">✅</span>
@@ -577,14 +555,8 @@
     let adminPin = '1234';
     let isAdminUnlocked = false;
 
-    // Initial mock data for teacher's lounge
-    let entries = [
-      { id: 'e1', name: 'Frau Schmidt (SCH)', drinkId: 'wasser', amount: 2, pricePerUnit: 0.50, total: 1.00, timestamp: new Date(Date.now() - 3600000 * 2).toISOString(), paid: false },
-      { id: 'e2', name: 'Herr Weber (WEB)', drinkId: 'apfelschorle', amount: 1, pricePerUnit: 0.80, total: 0.80, timestamp: new Date(Date.now() - 3600000 * 5).toISOString(), paid: false },
-      { id: 'e3', name: 'Herr Müller (MÜL)', drinkId: 'saft', amount: 1, pricePerUnit: 1.00, total: 1.00, timestamp: new Date(Date.now() - 3600000 * 24).toISOString(), paid: true },
-      { id: 'e4', name: 'Frau Becker (BEC)', drinkId: 'mate', amount: 2, pricePerUnit: 1.00, total: 2.00, timestamp: new Date(Date.now() - 3600000 * 28).toISOString(), paid: false },
-      { id: 'e5', name: 'Herr Weber (WEB)', drinkId: 'wasser', amount: 1, pricePerUnit: 0.50, total: 0.50, timestamp: new Date(Date.now() - 3600000 * 48).toISOString(), paid: false },
-    ];
+    // Leere Buchungsliste (Demodaten entfernt)
+    let entries = [];
 
     let selectedDrinkId = 'wasser';
     let currentAmount = 1;
@@ -596,9 +568,9 @@
       renderDrinkGrid();
       updateSelectedDrinkDetails();
       updateQuickNamesList();
-      setupQrCode();
-
-      document.getElementById('qr-trigger-btn').addEventListener('click', openQrModal);
+      renderOverview();
+      renderHistoryLog();
+      renderPublicHistoryLog();
     });
 
     function initDateTimePicker() {
@@ -733,6 +705,7 @@
       updateQuickNamesList();
       renderOverview();
       renderHistoryLog();
+      renderPublicHistoryLog();
       if (isAdminUnlocked) renderAdminDashboard();
 
       // Show friendly confirmation toast
@@ -861,6 +834,7 @@
       closePaymentModal();
       renderOverview();
       renderHistoryLog();
+      renderPublicHistoryLog();
       showToast('Zahlung verbucht', `Die Buchungen für ${pendingPaymentPerson} wurden als beglichen markiert.`);
       pendingPaymentPerson = null;
     }
@@ -925,6 +899,7 @@
     function deleteEntry(id) {
       entries = entries.filter(e => e.id !== id);
       renderHistoryLog();
+      renderPublicHistoryLog();
       renderOverview();
       renderAdminDashboard();
       showToast('Gelöscht', 'Buchung wurde entfernt.');
@@ -1041,8 +1016,57 @@
       entries = entries.filter(e => !e.paid);
       renderOverview();
       renderHistoryLog();
+      renderPublicHistoryLog();
       renderAdminDashboard();
       showToast('Kassenschnitt durchgeführt', `${paidCount} bezahlte Buchungen wurden archiviert.`);
+    }
+
+    function renderPublicHistoryLog() {
+      const tbody = document.getElementById('public-history-table-body');
+      const emptyState = document.getElementById('public-empty-log-state');
+      if (!tbody) return;
+
+      const filter = (document.getElementById('public-log-search')?.value || '').toLowerCase();
+
+      const filtered = entries.filter(e => {
+        const drink = DRINKS.find(d => d.id === e.drinkId);
+        const drinkName = drink ? drink.name.toLowerCase() : '';
+        return e.name.toLowerCase().includes(filter) || drinkName.includes(filter);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+      emptyState?.classList.add('hidden');
+
+      tbody.innerHTML = filtered.map(e => {
+        const drink = DRINKS.find(d => d.id === e.drinkId);
+        const dateObj = new Date(e.timestamp);
+        const formattedDate = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + ' ' +
+                              dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <tr class="hover:bg-aqua-50/40 transition">
+            <td class="py-2.5 px-3 text-gray-500 whitespace-nowrap">${formattedDate}</td>
+            <td class="py-2.5 px-3 font-semibold text-aqua-900">${e.name}</td>
+            <td class="py-2.5 px-3">
+              <span class="inline-flex items-center gap-1.5">
+                <span>${drink ? drink.icon : '🥤'}</span>
+                <span>${drink ? drink.name : e.drinkId}</span>
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-center font-bold">${e.amount}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-aqua-900">${e.total.toFixed(2).replace('.', ',')} €</td>
+            <td class="py-2.5 px-3 text-center">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.paid ? 'bg-green-100 text-green-800' : 'bg-peach-200 text-aqua-900'}">
+                ${e.paid ? 'Bezahlt ✓' : 'Offen'}
+              </span>
+            </td>
+          </tr>
+        `;
+      }).join('');
     }
 
     function renderAdminDashboard() {
@@ -1246,27 +1270,6 @@
       if (tab === 'log') renderHistoryLog();
     }
 
-    function openQrModal() {
-      document.getElementById('qr-modal').classList.remove('hidden');
-    }
-
-    function closeQrModal() {
-      document.getElementById('qr-modal').classList.add('hidden');
-    }
-
-    function setupQrCode() {
-      const qrContainer = document.getElementById('qrcode');
-      qrContainer.innerHTML = '';
-      new QRCode(qrContainer, {
-        text: window.location.href,
-        width: 170,
-        height: 170,
-        colorDark: "#253534",
-        colorLight: "#FFF6F3",
-        correctLevel: QRCode.CorrectLevel.M
-      });
-    }
-
     function exportCSV() {
       let csvContent = "data:text/csv;charset=utf-8,Datum;Name;Getraenk;Menge;Einzelpreis;Gesamt;Bezahlt\n";
       entries.forEach(e => {
@@ -1292,6 +1295,183 @@
       link.click();
       document.body.removeChild(link);
       showToast('CSV exportiert', 'Abrechnungsdatei wurde erfolgreich heruntergeladen.');
+    }
+
+    function exportPDF() {
+      if (typeof window.jspdf === 'undefined') {
+        showToast('Fehler', 'PDF-Bibliothek konnte nicht geladen werden.');
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4'
+      });
+
+      // Berechne Salden pro Person
+      const balances = {};
+      entries.forEach(e => {
+        if (!balances[e.name]) {
+          balances[e.name] = { totalOwed: 0, totalPaid: 0, items: {} };
+        }
+        if (!e.paid) {
+          balances[e.name].totalOwed += e.total;
+          balances[e.name].items[e.drinkId] = (balances[e.name].items[e.drinkId] || 0) + e.amount;
+        } else {
+          balances[e.name].totalPaid += e.total;
+        }
+      });
+
+      const names = Object.keys(balances).sort((a, b) => b.localeCompare(a));
+      const unpaidEntries = entries.filter(e => !e.paid);
+      const totalOwedAll = unpaidEntries.reduce((acc, curr) => acc + curr.total, 0);
+
+      // Farbpalette: Aqua Mist = #789A99 [120, 154, 153], Peach Ice = #FFD2C2 [255, 210, 194]
+      const colorAqua = [120, 154, 153];
+      const colorPeach = [255, 210, 194];
+      const colorDark = [37, 53, 52];
+
+      // Header Banner
+      doc.setFillColor(...colorAqua);
+      doc.rect(0, 0, 210, 32, 'F');
+
+      doc.setTextColor(255, 255, 255);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(18);
+      doc.text('Getränkefundus Lehrerzimmer', 15, 16);
+
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.setTextColor(255, 235, 229);
+      doc.text('Abrechnung der offenen Beträge zur Information für das Kollegium', 15, 24);
+
+      // Erstellungsdatum / Metadaten
+      const dateStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+      doc.setFontSize(9);
+      doc.text(`Stand: ${dateStr}`, 195, 24, { align: 'right' });
+
+      // Zusammenfassungsbox
+      doc.setFillColor(255, 246, 243);
+      doc.setDrawColor(...colorPeach);
+      doc.roundedRect(15, 38, 180, 18, 3, 3, 'FD');
+
+      doc.setTextColor(...colorDark);
+      doc.setFont('helvetica', 'bold');
+      doc.setFontSize(10);
+      doc.text('Gesamtsumme aller offenen Beträge:', 20, 49);
+
+      doc.setFontSize(13);
+      doc.setTextColor(180, 70, 50);
+      doc.text(`${totalOwedAll.toFixed(2).replace('.', ',')} €`, 190, 49, { align: 'right' });
+
+      // Tabellendaten aufbereiten
+      const tableRows = [];
+      const personList = Object.keys(balances).sort((a, b) => balances[b].totalOwed - balances[a].totalOwed);
+
+      if (personList.length === 0) {
+        tableRows.push(['Keine Einträge vorhanden', '-', '-', '0,00 €']);
+      } else {
+        personList.forEach(name => {
+          const data = balances[name];
+          const itemSummary = Object.entries(data.items).map(([drinkId, count]) => {
+            const drink = DRINKS.find(d => d.id === drinkId);
+            return `${count}x ${drink ? drink.name : drinkId}`;
+          }).join(', ');
+
+          const status = data.totalOwed > 0 ? 'Offen' : 'Ausgeglichen';
+          const owedFormatted = `${data.totalOwed.toFixed(2).replace('.', ',')} €`;
+
+          tableRows.push([
+            name,
+            itemSummary || 'Keine offenen Posten',
+            status,
+            owedFormatted
+          ]);
+        });
+      }
+
+      // Tabelle rendern mit autoTable
+      doc.autoTable({
+        startY: 62,
+        head: [['Kollege / Kollegin', 'Offene Entnahmen (Details)', 'Status', 'Zu zahlen']],
+        body: tableRows,
+        theme: 'grid',
+        styles: {
+          font: 'helvetica',
+          fontSize: 9.5,
+          cellPadding: 4,
+          textColor: colorDark,
+          lineColor: [222, 235, 236],
+          lineWidth: 0.2
+        },
+        headStyles: {
+          fillColor: colorAqua,
+          textColor: [255, 255, 255],
+          fontStyle: 'bold',
+          halign: 'left'
+        },
+        columnStyles: {
+          0: { cellWidth: 50, fontStyle: 'bold' },
+          1: { cellWidth: 80 },
+          2: { cellWidth: 25, halign: 'center' },
+          3: { cellWidth: 25, halign: 'right', fontStyle: 'bold' }
+        },
+        alternateRowStyles: {
+          fillColor: [248, 250, 250]
+        },
+        didParseCell: function(data) {
+          if (data.section === 'body' && data.column.index === 3) {
+            const rowValue = data.row.raw[3];
+            if (rowValue !== '0,00 €') {
+              data.cell.styles.textColor = [190, 60, 40];
+            } else {
+              data.cell.styles.textColor = [50, 130, 80];
+            }
+          }
+          if (data.section === 'body' && data.column.index === 2) {
+            const statusVal = data.row.raw[2];
+            if (statusVal === 'Offen') {
+              data.cell.styles.textColor = [190, 60, 40];
+            } else {
+              data.cell.styles.textColor = [50, 130, 80];
+            }
+          }
+        }
+      });
+
+      // Fußnoten- / Info-Box zur Bezahlung
+      const finalY = doc.lastAutoTable.finalY + 10;
+      if (finalY < 265) {
+        doc.setFillColor(242, 247, 247);
+        doc.setDrawColor(...colorAqua);
+        doc.roundedRect(15, finalY, 180, 18, 2, 2, 'FD');
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(8.5);
+        doc.setTextColor(...colorDark);
+        doc.text('Hinweis für das Kollegium:', 20, finalY + 6);
+
+        doc.setFont('helvetica', 'normal');
+        doc.setFontSize(8);
+        doc.setTextColor(70, 100, 99);
+        doc.text('Bitte begleiche deinen offenen Betrag zeitnah bar in die Funduskasse oder beim organisierenden Kollegen.', 20, finalY + 12);
+      }
+
+      // Seitennummerierung
+      const pageCount = doc.internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(8);
+        doc.setTextColor(140, 140, 140);
+        doc.text(`Seite ${i} von ${pageCount} • Automatisch erstellt über das Lehrerzimmer-System`, 105, 290, { align: 'center' });
+      }
+
+      // Download initiieren
+      const fileNameDate = new Date().toISOString().slice(0, 10);
+      doc.save(`Getraenkefundus_Abrechnung_${fileNameDate}.pdf`);
+      showToast('PDF erstellt', 'Die Abrechnung wurde als PDF heruntergeladen.');
     }
 
     let toastTimeout;
