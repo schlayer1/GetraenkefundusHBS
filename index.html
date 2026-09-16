@@ -788,6 +788,7 @@
     let collectionPrefix = localStorage.getItem('hbs_collection_prefix') || 'hbs_';
     let unsubscribeDrinks = null;
     let unsubscribeEntries = null;
+    let unsubscribeSettings = null;
 
     function col(name) {
       return db.collection(collectionPrefix + name);
@@ -941,6 +942,16 @@
           refreshAllViews();
         }, err => {
           console.error("Firestore Bookings Error:", err);
+        });
+
+        // Realtime Listener für Admin-PIN & Einstellungen
+        unsubscribeSettings = col('settings').doc('admin').onSnapshot(doc => {
+          if (doc.exists && doc.data() && doc.data().pin) {
+            adminPin = doc.data().pin;
+            localStorage.setItem('hbs_admin_pin', adminPin);
+          }
+        }, err => {
+          console.warn("Firestore Settings Listener:", err);
         });
 
       } catch (e) {
@@ -1759,12 +1770,25 @@
       showToast('Admin abgemeldet', 'Der Verwaltungsbereich wurde gesperrt.');
     }
 
-    function changeAdminPin() {
+    async function changeAdminPin() {
       const newPin = document.getElementById('new-admin-pin').value.trim();
       if (newPin.length >= 4) {
         adminPin = newPin;
         localStorage.setItem('hbs_admin_pin', adminPin);
         document.getElementById('new-admin-pin').value = '';
+
+        if (isFirebaseActive && db) {
+          try {
+            await col('settings').doc('admin').set({ pin: newPin, updatedAt: new Date().toISOString() }, { merge: true });
+            showToast('PIN synchronisiert', 'Neuer Admin-PIN wurde in der Cloud gespeichert und gilt nun auf allen Geräten.');
+            return;
+          } catch (err) {
+            console.error("Fehler beim Cloud-Speichern der PIN:", err);
+            showToast('Lokal gespeichert', 'PIN lokal geändert (Cloud-Fehler: ' + err + ')');
+            return;
+          }
+        }
+
         showToast('PIN geändert', 'Neuer Admin-PIN ist nun aktiv.');
       } else {
         showToast('Ungültiger PIN', 'Der PIN muss mindestens 4 Ziffern umfassen.');
@@ -1868,6 +1892,7 @@
       localStorage.removeItem('hbs_firebase_config');
       if (unsubscribeDrinks) unsubscribeDrinks();
       if (unsubscribeEntries) unsubscribeEntries();
+      if (unsubscribeSettings) unsubscribeSettings();
       closeFirebaseConfigModal();
       initLocalStorageMode();
       showToast("Trennt", "Firebase getrennt. Lokaler Speicher aktiv.");
