@@ -3,45 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Lehrerzimmer Getränkefundus</title>
-  <!-- Google Fonts: Inter -->
+  <title>Getränkefundus • Regelschule Kahla</title>
+
+  <!-- Google Fonts: Plus Jakarta Sans (HBS Design System) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- jsPDF and AutoTable for clean PDF reports -->
+
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- jsPDF and AutoTable -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Firebase App & Firestore (Compat SDK for robust client-side usage) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
 
   <script>
     tailwind.config = {
       theme: {
         extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
+            sans: ['"Plus Jakarta Sans"', 'system-ui', '-apple-system', 'sans-serif'],
           },
           colors: {
-            peach: {
-              DEFAULT: '#FFD2C2',
-              50: '#FFF6F3',
-              100: '#FFEBE5',
-              200: '#FFD2C2',
-              300: '#FAB39C',
-              400: '#F08D6E',
+            // Regelschule Kahla - Offizielles Corporate Design
+            cerulean: {
+              DEFAULT: '#0B7BA7',
+              50: '#F0F8FA',
+              100: '#E6F4F8',
+              200: '#C7E5F0',
+              300: '#8AC3DC',
+              400: '#439EC5',
+              500: '#0B7BA7',
+              600: '#086488',
+              700: '#006185',
+              800: '#004C6A',
+              900: '#002B3D',
             },
-            aqua: {
-              DEFAULT: '#789A99',
-              50: '#F2F7F7',
-              100: '#DEEBEC',
-              200: '#C2DADB',
-              300: '#9EBEBF',
-              400: '#789A99',
-              500: '#5C7E7D',
-              600: '#466463',
-              700: '#344B4A',
-              800: '#253534',
-              900: '#172221',
+            teal: {
+              DEFAULT: '#00A896',
+              50: '#E6F6F5',
+              100: '#C7EFEA',
+              200: '#9CE3DA',
+              300: '#64D3C5',
+              400: '#2EC0AF',
+              500: '#00A896',
+              600: '#008C7D',
+              700: '#006B5F',
+              800: '#005047',
+              900: '#00332D',
+            },
+            marigold: {
+              DEFAULT: '#F39200',
+              50: '#FEF7EE',
+              100: '#FDE8CD',
+              200: '#FBCF95',
+              300: '#F8B155',
+              400: '#F59E21',
+              500: '#F39200',
+              600: '#D97706',
+              700: '#A76300',
+              800: '#693C00',
+              900: '#3D2200',
+            },
+            slate: {
+              DEFAULT: '#2C3E50',
+              50: '#F8FBFC',
+              100: '#F1F5F9',
+              200: '#E2E8F0',
+              300: '#CBD5E1',
+              400: '#94A3B8',
+              500: '#64748B',
+              600: '#475569',
+              700: '#334155',
+              800: '#2C3E50',
+              900: '#091D2E',
             }
           }
         }
@@ -51,8 +93,8 @@
 
   <style>
     body {
-      background-color: #F8F6F4;
-      color: #253534;
+      background-color: #F8FBFC;
+      color: #091D2E;
       -webkit-tap-highlight-color: transparent;
     }
     .custom-scrollbar::-webkit-scrollbar {
@@ -60,149 +102,179 @@
       width: 6px;
     }
     .custom-scrollbar::-webkit-scrollbar-track {
-      background: #F2F7F7;
+      background: #F0F8FA;
       border-radius: 9999px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #C2DADB;
+      background: #C7E5F0;
       border-radius: 9999px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #8AC3DC;
     }
   </style>
 </head>
-<body class="min-h-screen flex flex-col font-sans selection:bg-peach selection:text-aqua-900 pb-16 md:pb-6">
+<body class="min-h-screen flex flex-col font-sans selection:bg-cerulean-100 selection:text-cerulean-900 pb-16 md:pb-8">
 
-  <header class="bg-aqua text-white shadow-md sticky top-0 z-30 transition-all duration-300">
+  <!-- Header mit Schullogo & Branding -->
+  <header class="bg-cerulean text-white shadow-md sticky top-0 z-30 transition-all duration-300 border-b border-cerulean-600">
     <div class="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
       <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-peach text-aqua-800 flex items-center justify-center font-bold text-xl shadow-inner">
-          🥤
+        <!-- HBS Schulsiegel -->
+        <div class="w-11 h-11 rounded-xl bg-white p-0.5 shadow-sm ring-2 ring-white/30 flex items-center justify-center shrink-0">
+          <img src="assets/brand/siegel_logo.png" onerror="this.onerror=null; this.src='Siegel_bunt.png';" alt="Regelschule Kahla Siegel" class="w-full h-full object-contain">
         </div>
         <div>
-          <h1 class="text-lg font-bold tracking-tight leading-tight text-peach-50">Getränkefundus</h1>
-          <p class="text-xs text-peach-200 font-medium">Lehrerzimmer Vertrauenskasse</p>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base sm:text-lg font-bold tracking-tight text-white leading-tight">Getränkefundus</h1>
+            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-cerulean-600 text-cerulean-100 border border-cerulean-400/40">
+              HBS Kahla
+            </span>
+          </div>
+          <p class="text-[11px] text-cerulean-100 font-medium">Lehrerzimmer Vertrauenskasse</p>
         </div>
       </div>
+
       <div class="flex items-center space-x-2">
-        <button id="admin-header-btn" onclick="toggleAdminMode()" class="text-xs bg-peach text-aqua-900 hover:bg-peach-300 font-bold px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition shadow-xs">
-          <span id="admin-lock-icon">🔒</span>
-          <span id="admin-header-text">Admin-Bereich</span>
+        <!-- Live Cloud / Sync Status Pill -->
+        <button id="sync-status-btn" onclick="openFirebaseConfigModal()" title="Klicken für Cloud-Status & Einstellungen"
+          class="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold px-2.5 py-1 rounded-lg bg-cerulean-800/80 hover:bg-cerulean-900 text-cerulean-100 border border-cerulean-400/30 transition">
+          <span id="sync-indicator-dot" class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="sync-status-text">Cloud-Sync</span>
+        </button>
+
+        <!-- Admin Button -->
+        <button id="admin-header-btn" onclick="toggleAdminMode()" class="text-xs bg-marigold hover:bg-marigold-600 text-white font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition shadow-sm active:scale-95">
+          <i id="admin-header-icon" data-lucide="lock" class="w-3.5 h-3.5"></i>
+          <span id="admin-header-text">Admin</span>
         </button>
       </div>
     </div>
   </header>
 
   <main class="max-w-4xl w-full mx-auto px-4 py-4 flex-1">
-    <!-- Admin Navigation Bar (Nur sichtbar, wenn Admin eingeloggt ist) -->
-    <nav id="admin-sub-nav" class="hidden flex rounded-2xl bg-white p-1.5 shadow-sm border border-aqua-200 mb-5 gap-1">
-      <button id="tab-btn-admin-stock" onclick="switchAdminSubTab('stock')" class="flex-1 py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 bg-aqua text-white shadow-sm">
-        <span>📦</span>
+    <!-- Admin Navigation Bar (Nur sichtbar im Admin-Bereich) -->
+    <nav id="admin-sub-nav" class="hidden flex flex-wrap rounded-2xl bg-white p-1.5 shadow-sm border border-cerulean-100 mb-5 gap-1">
+      <button id="tab-btn-admin-stock" onclick="switchAdminSubTab('stock')" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 bg-cerulean text-white shadow-xs">
+        <i data-lucide="boxes" class="w-3.5 h-3.5"></i>
         <span>Vorrat & Sortiment</span>
       </button>
-      <button id="tab-btn-admin-overview" onclick="switchAdminSubTab('overview')" class="flex-1 py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 text-aqua-700 hover:bg-peach-50">
-        <span>📊</span>
+      <button id="tab-btn-admin-overview" onclick="switchAdminSubTab('overview')" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 text-slate-700 hover:bg-cerulean-50">
+        <i data-lucide="bar-chart-3" class="w-3.5 h-3.5"></i>
         <span>Abrechnung & Salden</span>
       </button>
-      <button id="tab-btn-admin-log" onclick="switchAdminSubTab('log')" class="flex-1 py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 text-aqua-700 hover:bg-peach-50">
-        <span>📜</span>
+      <button id="tab-btn-admin-log" onclick="switchAdminSubTab('log')" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 text-slate-700 hover:bg-cerulean-50">
+        <i data-lucide="history" class="w-3.5 h-3.5"></i>
         <span>Buchungs-Historie</span>
+      </button>
+      <button id="tab-btn-admin-settings" onclick="switchAdminSubTab('settings')" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 text-slate-700 hover:bg-cerulean-50">
+        <i data-lucide="cloud-cog" class="w-3.5 h-3.5"></i>
+        <span>Cloud & PIN</span>
       </button>
     </nav>
 
     <!-- 1. Kollegiums-Ansicht: Reine Entnahme-Buchung -->
     <section id="view-book" class="space-y-5">
-      <!-- Quick Info Banner -->
-      <div class="bg-peach-100 border border-peach-300 rounded-2xl p-3.5 flex items-start gap-3 shadow-xs">
-        <span class="text-xl">💡</span>
-        <div class="text-xs text-aqua-900 leading-relaxed">
+      <!-- Info Banner -->
+      <div class="bg-cerulean-50 border border-cerulean-200/70 rounded-2xl p-3.5 flex items-start gap-3 shadow-xs">
+        <div class="p-1.5 rounded-lg bg-cerulean-100 text-cerulean-700 shrink-0">
+          <i data-lucide="sparkles" class="w-4 h-4"></i>
+        </div>
+        <div class="text-xs text-slate-800 leading-relaxed">
           <strong>Getränk entnommen?</strong> Bitte wähle dein Getränk aus, trage deinen Namen ein (z. B. <em>Frau Schmidt</em> oder <em>Herr Weber</em>) und tippe auf <em>"Entnahme buchen"</em>. Vielen Dank!
         </div>
       </div>
 
-      <!-- Main Form Card -->
-      <div class="bg-white rounded-3xl p-5 md:p-6 shadow-md border border-aqua-100">
+      <!-- Haupt-Buchungskarte -->
+      <div class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-cerulean-100">
         <form id="drink-form" onsubmit="handleFormSubmit(event)" class="space-y-6">
 
-          <!-- Colleague Name Input -->
+          <!-- Kollege / Name -->
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-2">
+            <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-2">
               Wer bist du? (Bitte Namen eingeben)
             </label>
             <div class="space-y-2">
-              <input type="text" id="user-name" required placeholder="z. B. Frau Schmidt, Herr Weber oder Herr Müller" autocomplete="name"
-                class="w-full px-4 py-3 rounded-xl border-2 border-aqua-200 focus:border-aqua focus:outline-none text-base font-semibold text-aqua-900 placeholder:text-gray-400 bg-white transition shadow-sm">
-              <!-- Quick Select Buttons for Frequent Colleagues -->
+              <div class="relative">
+                <input type="text" id="user-name" required placeholder="z. B. Frau Schmidt, Herr Weber..." autocomplete="name"
+                  class="w-full pl-10 pr-4 py-3 rounded-xl border-2 border-slate-200 focus:border-cerulean focus:outline-none text-base font-semibold text-slate-900 placeholder:text-slate-400 bg-white transition shadow-xs">
+                <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  <i data-lucide="user" class="w-4 h-4"></i>
+                </div>
+              </div>
+              <!-- Schnellwahl-Buttons -->
               <div class="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs custom-scrollbar">
-                <span class="text-gray-400 shrink-0 font-medium">Zuletzt:</span>
+                <span class="text-slate-400 shrink-0 font-semibold flex items-center gap-1">
+                  <i data-lucide="clock" class="w-3 h-3"></i> Zuletzt:
+                </span>
                 <div id="quick-names" class="flex items-center gap-1.5 shrink-0">
-                  <!-- Populated by JS -->
+                  <!-- Dynamisch -->
                 </div>
               </div>
             </div>
           </div>
 
+          <!-- Getränkeauswahl-Kacheln mit sauberen Flaschenbildern -->
           <div>
-            <div class="flex justify-between items-center mb-2">
-              <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700">
+            <div class="flex justify-between items-center mb-2.5">
+              <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700">
                 Getränk auswählen
               </label>
-              <span id="selected-drink-price" class="text-xs font-bold text-aqua bg-aqua-50 px-2 py-0.5 rounded-md">
+              <span id="selected-drink-price" class="text-xs font-bold text-cerulean bg-cerulean-50 px-2.5 py-1 rounded-lg border border-cerulean-100">
                 0,50 € pro Flasche
               </span>
             </div>
 
-            <!-- Drink Grid -->
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5" id="drink-selector-grid">
-              <!-- Dynamically populated drinks with active state -->
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3" id="drink-selector-grid">
+              <!-- Dynamisch gefüllt via renderDrinkGrid() -->
             </div>
           </div>
 
-          <!-- Quantity and Date Selection -->
+          <!-- Anzahl & Datum -->
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
-            <!-- Amount Stepper -->
+            <!-- Mengen-Stepper -->
             <div class="min-w-0">
-              <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-2">
+              <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-2">
                 Anzahl Flaschen
               </label>
-              <div class="flex items-center border-2 border-aqua-200 rounded-xl bg-aqua-50/50 p-1">
-                <button type="button" onclick="adjustAmount(-1)" class="w-12 h-11 bg-white hover:bg-peach-100 active:bg-peach-200 text-aqua-700 font-bold rounded-lg shadow-xs flex items-center justify-center text-xl transition">
-                  –
+              <div class="flex items-center border-2 border-slate-200 rounded-xl bg-slate-50 p-1">
+                <button type="button" onclick="adjustAmount(-1)" class="w-12 h-11 bg-white hover:bg-cerulean-50 active:bg-cerulean-100 text-cerulean font-bold rounded-lg shadow-xs flex items-center justify-center text-xl transition">
+                  <i data-lucide="minus" class="w-4 h-4"></i>
                 </button>
-                <input type="number" id="drink-amount" min="1" max="12" value="1" readonly class="w-full text-center bg-transparent font-bold text-xl text-aqua-900 focus:outline-none">
-                <button type="button" onclick="adjustAmount(1)" class="w-12 h-11 bg-white hover:bg-peach-100 active:bg-peach-200 text-aqua-700 font-bold rounded-lg shadow-xs flex items-center justify-center text-xl transition">
-                  +
+                <input type="number" id="drink-amount" min="1" max="24" value="1" readonly class="w-full text-center bg-transparent font-extrabold text-xl text-slate-900 focus:outline-none">
+                <button type="button" onclick="adjustAmount(1)" class="w-12 h-11 bg-white hover:bg-cerulean-50 active:bg-cerulean-100 text-cerulean font-bold rounded-lg shadow-xs flex items-center justify-center text-xl transition">
+                  <i data-lucide="plus" class="w-4 h-4"></i>
                 </button>
               </div>
             </div>
 
-            <!-- Date & Time Input -->
+            <!-- Datum & Uhrzeit -->
             <div class="min-w-0">
               <div class="flex items-center justify-between mb-2">
-                <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700">
+                <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700">
                   Datum & Uhrzeit
                 </label>
-                <button type="button" onclick="initDateTimePicker()" class="text-[11px] text-aqua hover:underline font-semibold">
-                  Jetzt
+                <button type="button" onclick="initDateTimePicker()" class="text-[11px] text-cerulean hover:underline font-semibold flex items-center gap-1">
+                  <i data-lucide="refresh-cw" class="w-3 h-3"></i> Jetzt
                 </button>
               </div>
               <input type="datetime-local" id="entry-date" required
-                class="w-full max-w-full box-border px-3 py-2.5 h-[52px] rounded-xl border-2 border-aqua-200 focus:border-aqua focus:outline-none text-xs sm:text-sm font-medium text-aqua-900 bg-white shadow-xs">
+                class="w-full max-w-full box-border px-3 py-2.5 h-[52px] rounded-xl border-2 border-slate-200 focus:border-cerulean focus:outline-none text-xs sm:text-sm font-semibold text-slate-900 bg-white shadow-xs">
             </div>
           </div>
 
-          <!-- Total Calculation Display & Submit Button -->
+          <!-- Summe & Buchen-Button -->
           <div class="pt-2">
-            <div class="flex items-center justify-between p-3.5 bg-peach-50 rounded-2xl border border-peach-200 mb-4">
-              <div class="flex items-center gap-2">
-                <span class="w-3 h-3 rounded-full bg-peach-400 inline-block"></span>
-                <span class="text-sm font-medium text-aqua-800">Zu zahlender Betrag:</span>
+            <div class="flex items-center justify-between p-4 bg-marigold-50 rounded-2xl border border-marigold-200/80 mb-4">
+              <div class="flex items-center gap-2.5">
+                <div class="w-3 h-3 rounded-full bg-marigold animate-pulse"></div>
+                <span class="text-sm font-semibold text-slate-800">Zu zahlender Betrag:</span>
               </div>
-              <span id="booking-sum" class="text-lg font-extrabold text-aqua-900">0,50 €</span>
+              <span id="booking-sum" class="text-xl font-extrabold text-marigold-700">0,50 €</span>
             </div>
 
-            <button type="submit" class="w-full py-4 px-6 rounded-2xl bg-aqua hover:bg-aqua-500 active:scale-[0.99] text-white font-bold text-base shadow-lg shadow-aqua/20 transition-all flex items-center justify-center gap-2">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-              </svg>
+            <button type="submit" id="book-submit-btn" class="w-full py-3.5 px-6 rounded-2xl bg-cerulean hover:bg-cerulean-600 active:scale-[0.99] text-white font-bold text-base shadow-md shadow-cerulean/20 transition-all flex items-center justify-center gap-2">
+              <i data-lucide="check-circle" class="w-5 h-5"></i>
               <span>Entnahme jetzt buchen</span>
             </button>
           </div>
@@ -210,27 +282,32 @@
         </form>
       </div>
 
-      <!-- Öffentlich einsehbare Buchungshistorie für das Kollegium -->
-      <div class="bg-white rounded-3xl p-5 md:p-6 shadow-md border border-aqua-100 space-y-4">
+      <!-- Öffentliche Buchungshistorie für das Kollegium -->
+      <div class="bg-white rounded-3xl p-5 md:p-6 shadow-sm border border-cerulean-100 space-y-4">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
           <div>
-            <h3 class="text-base font-bold text-aqua-900 flex items-center gap-2">
-              <span>📜</span>
-              <span>Buchungshistorie & Offene Beträge</span>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i data-lucide="scroll-text" class="w-4 h-4 text-cerulean"></i>
+              <span>Buchungshistorie & Salden</span>
             </h3>
-            <p class="text-xs text-aqua-600">Sieh nach, was du bisher entnommen hast oder filtere gezielt nach deinem Namen.</p>
+            <p class="text-xs text-slate-500">Transparente Übersicht für alle Kolleginnen und Kollegen.</p>
           </div>
           <div class="w-full sm:w-auto">
-            <input type="text" id="public-log-search" oninput="renderPublicHistoryLog()" placeholder="Nach Name suchen..."
-              class="w-full sm:w-56 text-xs px-3 py-2 rounded-xl border border-aqua-200 focus:outline-none focus:border-aqua bg-aqua-50/30">
+            <div class="relative">
+              <input type="text" id="public-log-search" oninput="renderPublicHistoryLog()" placeholder="Nach Name filtern..."
+                class="w-full sm:w-56 text-xs pl-8 pr-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-cerulean bg-slate-50">
+              <div class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                <i data-lucide="search" class="w-3.5 h-3.5"></i>
+              </div>
+            </div>
           </div>
         </div>
 
         <div class="overflow-x-auto">
-          <table class="w-full text-left text-xs text-aqua-900">
-            <thead class="bg-aqua-50 text-aqua-800 uppercase font-bold text-[10px] tracking-wider border-b border-aqua-100">
+          <table class="w-full text-left text-xs text-slate-900">
+            <thead class="bg-cerulean-50 text-cerulean-800 uppercase font-bold text-[10px] tracking-wider border-b border-cerulean-100">
               <tr>
-                <th class="py-2.5 px-3 rounded-l-lg">Datum / Uhrzeit</th>
+                <th class="py-2.5 px-3 rounded-l-lg">Datum</th>
                 <th class="py-2.5 px-3">Kollege/in</th>
                 <th class="py-2.5 px-3">Getränk</th>
                 <th class="py-2.5 px-3 text-center">Menge</th>
@@ -238,14 +315,14 @@
                 <th class="py-2.5 px-3 text-center rounded-r-lg">Status</th>
               </tr>
             </thead>
-            <tbody id="public-history-table-body" class="divide-y divide-gray-100 font-medium">
-              <!-- Dynamisch durch renderPublicHistoryLog() gefüllt -->
+            <tbody id="public-history-table-body" class="divide-y divide-slate-100 font-medium">
+              <!-- Dynamisch -->
             </tbody>
           </table>
         </div>
 
-        <div id="public-empty-log-state" class="hidden py-8 text-center text-gray-400">
-          <div class="text-3xl mb-1">📭</div>
+        <div id="public-empty-log-state" class="hidden py-8 text-center text-slate-400">
+          <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
           <p class="text-xs">Noch keine Buchungen vorhanden.</p>
         </div>
       </div>
@@ -254,60 +331,61 @@
     <!-- 2. Admin-Dashboard Bereich (Nur nach PIN-Eingabe sichtbar) -->
     <section id="view-admin" class="space-y-5 hidden">
       <!-- Admin Header Banner -->
-      <div class="bg-gradient-to-r from-aqua-600 to-aqua p-5 rounded-3xl text-white shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+      <div class="bg-gradient-to-r from-cerulean-700 to-cerulean p-5 rounded-3xl text-white shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <div class="flex items-center gap-2">
-            <span class="bg-peach text-aqua-900 font-black text-xs px-2.5 py-0.5 rounded-full uppercase tracking-wider">Admin-Zentrale</span>
-            <span class="text-xs text-peach-100">Lehrerzimmer-Organisation</span>
+            <span class="bg-marigold text-white font-extrabold text-[11px] px-2.5 py-0.5 rounded-full uppercase tracking-wider">Admin-Zentrale</span>
+            <span class="text-xs text-cerulean-100 font-medium">Lehrerzimmer-Organisation HBS</span>
           </div>
-          <h2 class="text-xl font-bold text-white mt-1">Getränkefundus Verwaltung</h2>
-          <p class="text-xs text-aqua-100 mt-0.5">Vorräte pflegen, Abrechnungen einsehen und Buchungen verwalten.</p>
+          <h2 class="text-xl font-extrabold text-white mt-1">Getränkefundus Verwaltung</h2>
+          <p class="text-xs text-cerulean-100 mt-0.5">Vorräte pflegen, Abrechnungen einsehen und Kasse kontrollieren.</p>
         </div>
         <div class="flex items-center gap-2">
-          <button onclick="returnToBookingView()" class="px-3.5 py-2 bg-aqua-700 hover:bg-aqua-800 text-white font-semibold rounded-xl text-xs flex items-center gap-1.5 transition">
-            <span>← Zurück zum Buchen</span>
+          <button onclick="returnToBookingView()" class="px-3.5 py-2 bg-cerulean-800 hover:bg-cerulean-900 text-white font-semibold rounded-xl text-xs flex items-center gap-1.5 transition shadow-xs">
+            <i data-lucide="arrow-left" class="w-3.5 h-3.5"></i>
+            <span>Zurück zum Buchen</span>
           </button>
-          <button onclick="lockAdmin()" title="Admin sperren" class="px-3.5 py-2 bg-peach text-aqua-900 hover:bg-peach-300 font-bold rounded-xl text-xs flex items-center gap-1 transition">
-            <span>🔒</span>
+          <button onclick="lockAdmin()" title="Admin sperren" class="px-3.5 py-2 bg-marigold hover:bg-marigold-600 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 transition shadow-xs">
+            <i data-lucide="lock" class="w-3.5 h-3.5"></i>
             <span>Abmelden</span>
           </button>
         </div>
       </div>
 
-      <!-- Quick KPI Stats for Organizer -->
+      <!-- KPI Stats -->
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div class="bg-white p-4 rounded-2xl border border-aqua-100 shadow-xs">
-          <span class="text-[11px] font-semibold text-aqua-700 uppercase">Sortiment</span>
-          <div class="text-xl font-black text-aqua-900 mt-1" id="admin-stat-drink-count">0 Sorten</div>
-          <span class="text-[10px] text-gray-500">im Fundus</span>
+        <div class="bg-white p-4 rounded-2xl border border-cerulean-100 shadow-xs">
+          <span class="text-[11px] font-bold text-cerulean uppercase">Sortiment</span>
+          <div class="text-xl font-extrabold text-slate-900 mt-1" id="admin-stat-drink-count">0 Sorten</div>
+          <span class="text-[10px] text-slate-500 font-medium">im Fundus</span>
         </div>
-        <div class="bg-white p-4 rounded-2xl border border-aqua-100 shadow-xs">
-          <span class="text-[11px] font-semibold text-aqua-700 uppercase">Lagerbestand</span>
-          <div class="text-xl font-black text-aqua-900 mt-1" id="admin-stat-total-stock">0 Flaschen</div>
-          <span class="text-[10px] text-gray-500">aktuell vorrätig</span>
+        <div class="bg-white p-4 rounded-2xl border border-cerulean-100 shadow-xs">
+          <span class="text-[11px] font-bold text-cerulean uppercase">Lagerbestand</span>
+          <div class="text-xl font-extrabold text-slate-900 mt-1" id="admin-stat-total-stock">0 Flaschen</div>
+          <span class="text-[10px] text-slate-500 font-medium">aktuell vorrätig</span>
         </div>
-        <div class="bg-white p-4 rounded-2xl border border-aqua-100 shadow-xs">
-          <span class="text-[11px] font-semibold text-aqua-700 uppercase">Nachkauf nötig</span>
-          <div class="text-xl font-black text-amber-600 mt-1" id="admin-stat-low-stock">0 Sorten</div>
-          <span class="text-[10px] text-gray-500">unter Mindestmenge</span>
+        <div class="bg-white p-4 rounded-2xl border border-cerulean-100 shadow-xs">
+          <span class="text-[11px] font-bold text-amber-600 uppercase">Nachkauf nötig</span>
+          <div class="text-xl font-extrabold text-amber-600 mt-1" id="admin-stat-low-stock">0 Sorten</div>
+          <span class="text-[10px] text-slate-500 font-medium">unter Mindestmenge</span>
         </div>
-        <div class="bg-white p-4 rounded-2xl border border-aqua-100 shadow-xs">
-          <span class="text-[11px] font-semibold text-aqua-700 uppercase">Offener Gesamtbetrag</span>
-          <div class="text-xl font-black text-peach-400 mt-1" id="admin-stat-open-sum">0,00 €</div>
-          <span class="text-[10px] text-gray-500">noch einzusammeln</span>
+        <div class="bg-white p-4 rounded-2xl border border-cerulean-100 shadow-xs">
+          <span class="text-[11px] font-bold text-marigold-600 uppercase">Offener Betrag</span>
+          <div class="text-xl font-extrabold text-marigold-600 mt-1" id="admin-stat-open-sum">0,00 €</div>
+          <span class="text-[10px] text-slate-500 font-medium">noch einzusammeln</span>
         </div>
       </div>
 
       <!-- Unter-Tab 1: Vorrat & Sortiment -->
       <div id="admin-tab-content-stock" class="space-y-4">
-        <div class="bg-white rounded-3xl p-5 shadow-sm border border-aqua-100">
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-cerulean-100">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
-              <h3 class="text-base font-bold text-aqua-900">Aktueller Flaschenbestand & Sortiment</h3>
-              <p class="text-xs text-aqua-600">Flaschen direkt aufstocken, Kisten buchen oder Preise editieren</p>
+              <h3 class="text-base font-bold text-slate-900">Aktueller Flaschenbestand & Sortiment</h3>
+              <p class="text-xs text-slate-500">Flaschen direkt aufstocken, Kisten buchen oder Preise editieren</p>
             </div>
-            <button onclick="openAddDrinkModal()" class="px-3.5 py-2 bg-peach text-aqua-900 hover:bg-peach-300 font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition">
-              <span class="text-base leading-none">+</span>
+            <button onclick="openAddDrinkModal()" class="px-3.5 py-2 bg-cerulean hover:bg-cerulean-600 text-white font-bold rounded-xl text-xs flex items-center gap-1.5 shadow-sm transition">
+              <i data-lucide="plus" class="w-4 h-4"></i>
               <span>Neues Getränk anlegen</span>
             </button>
           </div>
@@ -316,64 +394,40 @@
             <!-- Populated by JS -->
           </div>
         </div>
-
-        <!-- Settings & PIN Configuration Card -->
-        <div class="bg-white rounded-3xl p-5 shadow-sm border border-aqua-100 grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <h4 class="text-sm font-bold text-aqua-900 mb-1">Admin-PIN anpassen</h4>
-            <p class="text-xs text-gray-600 mb-3">Schütze diesen Bereich mit einem individuellen Zahlencode.</p>
-            <div class="flex gap-2 max-w-xs">
-              <input type="password" id="new-admin-pin" maxlength="8" placeholder="Neuer PIN (z.B. 4711)" class="px-3 py-2 text-xs rounded-xl border border-aqua-200 focus:outline-none focus:border-aqua w-full">
-              <button onclick="changeAdminPin()" class="px-4 py-2 bg-aqua hover:bg-aqua-500 text-white rounded-xl font-bold text-xs whitespace-nowrap transition">
-                Speichern
-              </button>
-            </div>
-          </div>
-
-          <div class="border-t md:border-t-0 md:border-l border-gray-100 pt-3 md:pt-0 md:pl-4">
-            <h4 class="text-sm font-bold text-aqua-900 mb-1">Kassenschnitt & Abrechnung</h4>
-            <p class="text-xs text-gray-600 mb-3">Bereinigt bereits vollständig bezahlte Buchungen aus der Anzeige.</p>
-            <button onclick="archivePaidBookings()" class="px-3.5 py-2 bg-gray-100 hover:bg-gray-200 text-aqua-800 font-semibold text-xs rounded-xl transition">
-              Bezahlte Buchungen bereinigen
-            </button>
-          </div>
-        </div>
       </div>
 
-      <!-- Unter-Tab 2: Abrechnung & Salden (ehemals Übersicht) -->
+      <!-- Unter-Tab 2: Abrechnung & Salden -->
       <div id="admin-tab-content-overview" class="space-y-4 hidden">
-        <!-- Restock Warning & Stock Consumption -->
-        <div class="bg-white rounded-3xl p-5 shadow-sm border border-aqua-100">
+        <!-- Nachkauf-Liste -->
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-cerulean-100">
           <div class="flex items-center justify-between mb-4">
             <div>
-              <h3 class="text-base font-bold text-aqua-900">Einkaufsliste & Nachbestell-Bedarf</h3>
-              <p class="text-xs text-aqua-600">Vergleich zwischen Mindestbestand und aktuellem Vorrat</p>
+              <h3 class="text-base font-bold text-slate-900">Einkaufsliste & Nachbestell-Bedarf</h3>
+              <p class="text-xs text-slate-500">Vergleich zwischen Mindestbestand und aktuellem Vorrat</p>
             </div>
-            <span class="text-xs bg-peach-100 text-aqua-900 font-semibold px-2.5 py-1 rounded-full">Einkaufshilfe</span>
+            <span class="text-xs bg-cerulean-50 text-cerulean-700 font-bold px-2.5 py-1 rounded-full border border-cerulean-100">
+              Einkaufshilfe
+            </span>
           </div>
           <div id="restock-list" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <!-- Populated by JS -->
           </div>
         </div>
 
-        <!-- Person Summary & Payment Status -->
-        <div class="bg-white rounded-3xl p-5 shadow-sm border border-aqua-100">
+        <!-- Kollegensalden & Bezahlung -->
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-cerulean-100">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-4">
             <div>
-              <h3 class="text-base font-bold text-aqua-900">Wer schuldet wie viel?</h3>
-              <p class="text-xs text-aqua-600">Übersicht pro Kollegin / Kollege mit Zahlungsstatus</p>
+              <h3 class="text-base font-bold text-slate-900">Wer schuldet wie viel?</h3>
+              <p class="text-xs text-slate-500">Übersicht pro Kollegin / Kollege mit Zahlungsstatus</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
-              <button onclick="exportPDF()" class="text-xs bg-peach text-aqua-900 hover:bg-peach-300 font-bold px-3 py-1.5 rounded-xl border border-peach-300 flex items-center gap-1.5 transition shadow-xs">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                </svg>
-                <span>Abrechnung als PDF erstellen</span>
+              <button onclick="exportPDF()" class="text-xs bg-cerulean text-white hover:bg-cerulean-600 font-bold px-3 py-1.5 rounded-xl flex items-center gap-1.5 transition shadow-xs">
+                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                <span>PDF-Abrechnung</span>
               </button>
-              <button onclick="exportCSV()" class="text-xs bg-aqua-50 hover:bg-aqua-100 text-aqua-800 font-semibold px-3 py-1.5 rounded-xl border border-aqua-200 flex items-center gap-1 transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                </svg>
+              <button onclick="exportCSV()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold px-3 py-1.5 rounded-xl flex items-center gap-1 transition">
+                <i data-lucide="download" class="w-3.5 h-3.5"></i>
                 <span>CSV</span>
               </button>
             </div>
@@ -387,23 +441,28 @@
 
       <!-- Unter-Tab 3: Historie / Log -->
       <div id="admin-tab-content-log" class="space-y-4 hidden">
-        <div class="bg-white rounded-3xl p-5 shadow-sm border border-aqua-100">
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-cerulean-100">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
             <div>
-              <h3 class="text-base font-bold text-aqua-900">Chronologisches Buchungsprotokoll</h3>
-              <p class="text-xs text-aqua-600">Alle erfassten Entnahmen einsehen, korrigieren oder löschen</p>
+              <h3 class="text-base font-bold text-slate-900">Chronologisches Buchungsprotokoll</h3>
+              <p class="text-xs text-slate-500">Alle erfassten Entnahmen einsehen, korrigieren oder löschen</p>
             </div>
             <div class="flex gap-2 w-full sm:w-auto">
-              <input type="text" id="log-search" oninput="renderHistoryLog()" placeholder="Nach Kollege oder Getränk filtern..."
-                class="w-full sm:w-64 text-xs px-3 py-2 rounded-xl border border-aqua-200 focus:outline-none focus:border-aqua">
+              <div class="relative w-full sm:w-64">
+                <input type="text" id="log-search" oninput="renderHistoryLog()" placeholder="Filtern..."
+                  class="w-full text-xs pl-8 pr-3 py-2 rounded-xl border border-slate-200 focus:outline-none focus:border-cerulean bg-slate-50">
+                <div class="absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  <i data-lucide="search" class="w-3.5 h-3.5"></i>
+                </div>
+              </div>
             </div>
           </div>
 
           <div class="overflow-x-auto">
-            <table class="w-full text-left text-xs text-aqua-900">
-              <thead class="bg-aqua-50 text-aqua-800 uppercase font-bold text-[10px] tracking-wider border-b border-aqua-100">
+            <table class="w-full text-left text-xs text-slate-900">
+              <thead class="bg-cerulean-50 text-cerulean-800 uppercase font-bold text-[10px] tracking-wider border-b border-cerulean-100">
                 <tr>
-                  <th class="py-2.5 px-3 rounded-l-lg">Datum / Uhrzeit</th>
+                  <th class="py-2.5 px-3 rounded-l-lg">Datum</th>
                   <th class="py-2.5 px-3">Kollege/in</th>
                   <th class="py-2.5 px-3">Getränk</th>
                   <th class="py-2.5 px-3 text-center">Menge</th>
@@ -412,79 +471,158 @@
                   <th class="py-2.5 px-3 text-right rounded-r-lg">Aktion</th>
                 </tr>
               </thead>
-              <tbody id="history-table-body" class="divide-y divide-gray-100 font-medium">
+              <tbody id="history-table-body" class="divide-y divide-slate-100 font-medium">
                 <!-- Populated by JS -->
               </tbody>
             </table>
           </div>
 
-          <!-- Empty state placeholder -->
-          <div id="empty-log-state" class="hidden py-8 text-center text-gray-400">
-            <div class="text-3xl mb-1">📭</div>
+          <div id="empty-log-state" class="hidden py-8 text-center text-slate-400">
+            <i data-lucide="inbox" class="w-8 h-8 mx-auto mb-2 text-slate-300"></i>
             <p class="text-xs">Keine Buchungen gefunden.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unter-Tab 4: Cloud, PIN & Wartung -->
+      <div id="admin-tab-content-settings" class="space-y-4 hidden">
+        <!-- Firebase Firestore Status & Konfiguration -->
+        <div class="bg-white rounded-3xl p-5 shadow-sm border border-cerulean-100">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-2.5">
+              <div class="p-2 rounded-xl bg-cerulean-50 text-cerulean">
+                <i data-lucide="cloud" class="w-5 h-5"></i>
+              </div>
+              <div>
+                <h3 class="text-base font-bold text-slate-900">Firebase Firestore Cloud-Datenbank</h3>
+                <p class="text-xs text-slate-500">Echtzeit-Synchronisation zwischen allen Lehrergeräten & Tablets</p>
+              </div>
+            </div>
+            <span id="settings-sync-badge" class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200">
+              Lokaler Modus
+            </span>
+          </div>
+
+          <div class="bg-slate-50 rounded-2xl p-4 border border-slate-200/80 mb-4 text-xs text-slate-700 space-y-2">
+            <p>
+              <strong>Status:</strong> <span id="firebase-status-desc">Prüfe Verbindung...</span>
+            </p>
+            <p class="text-[11px] text-slate-500 leading-relaxed">
+              Mit Firebase Firestore werden Buchungen und Vorräte in Echtzeit aktualisiert. Wenn jemand im Lehrerzimmer ein Getränk bucht, sieht der Admin den neuen Bestand sofort.
+            </p>
+          </div>
+
+          <div class="flex flex-wrap gap-2">
+            <button onclick="openFirebaseConfigModal()" class="px-4 py-2.5 bg-cerulean hover:bg-cerulean-600 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition">
+              <i data-lucide="key" class="w-3.5 h-3.5"></i>
+              <span>Firebase-Zugangsdaten konfigurieren</span>
+            </button>
+            <button onclick="seedInitialCatalogToCloud()" class="px-4 py-2.5 bg-teal hover:bg-teal-600 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 transition">
+              <i data-lucide="upload-cloud" class="w-3.5 h-3.5"></i>
+              <span>Standard-Sortiment in Cloud laden (Seed)</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- PIN & Kassenschnitt -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-white rounded-3xl p-5 shadow-sm border border-cerulean-100">
+            <h4 class="text-sm font-bold text-slate-900 mb-1 flex items-center gap-2">
+              <i data-lucide="shield-check" class="w-4 h-4 text-cerulean"></i>
+              <span>Admin-PIN anpassen</span>
+            </h4>
+            <p class="text-xs text-slate-500 mb-3">Schütze diesen Bereich mit einem individuellen Zahlencode.</p>
+            <div class="flex gap-2 max-w-xs">
+              <input type="password" id="new-admin-pin" maxlength="8" placeholder="Neuer PIN (z.B. 4711)" class="px-3 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:border-cerulean w-full font-bold">
+              <button onclick="changeAdminPin()" class="px-4 py-2 bg-cerulean hover:bg-cerulean-600 text-white rounded-xl font-bold text-xs whitespace-nowrap transition">
+                Speichern
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-3xl p-5 shadow-sm border border-cerulean-100">
+            <h4 class="text-sm font-bold text-slate-900 mb-1 flex items-center gap-2">
+              <i data-lucide="archive" class="w-4 h-4 text-cerulean"></i>
+              <span>Kassenschnitt & Bereinigung</span>
+            </h4>
+            <p class="text-xs text-slate-500 mb-3">Bereinigt alle bereits bezahlten Buchungen aus der Live-Anzeige.</p>
+            <button onclick="archivePaidBookings()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-semibold text-xs rounded-xl flex items-center gap-1.5 transition">
+              <i data-lucide="check-check" class="w-3.5 h-3.5"></i>
+              <span>Bezahlte Buchungen bereinigen</span>
+            </button>
           </div>
         </div>
       </div>
     </section>
   </main>
 
-  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-aqua-900 text-peach-100 px-5 py-3 rounded-2xl shadow-xl border border-peach flex items-center gap-3 transition-all duration-300 opacity-0 pointer-events-none translate-y-5 z-50">
-    <span class="text-xl" id="toast-icon">✅</span>
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-5 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl border border-cerulean-400 flex items-center gap-3 transition-all duration-300 opacity-0 pointer-events-none translate-y-5 z-50">
+    <div id="toast-icon-container" class="text-emerald-400 shrink-0">
+      <i data-lucide="check-circle-2" class="w-5 h-5"></i>
+    </div>
     <div>
       <h4 class="text-xs font-bold text-white" id="toast-title">Gebucht!</h4>
-      <p class="text-[11px] text-peach-200" id="toast-desc">Eintrag erfolgreich gespeichert.</p>
+      <p class="text-[11px] text-slate-300" id="toast-desc">Eintrag erfolgreich gespeichert.</p>
     </div>
   </div>
 
-  <div id="payment-modal" class="fixed inset-0 bg-black/50 backdrop-blur-xs flex items-center justify-center z-50 p-4 hidden">
-    <div class="bg-white rounded-2xl max-w-sm w-full p-5 shadow-xl border border-aqua-100">
-      <h3 class="text-base font-bold text-aqua-900 mb-1" id="payment-modal-title">Zahlung bestätigen</h3>
-      <p class="text-xs text-gray-600 mb-4" id="payment-modal-text">Möchtest du alle offenen Buchungen dieser Person als bezahlt markieren?</p>
+  <!-- Zahlungsbestätigungs-Modal -->
+  <div id="payment-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-cerulean-100">
+      <div class="w-12 h-12 rounded-2xl bg-teal-50 text-teal flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="wallet" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-bold text-slate-900 text-center mb-1" id="payment-modal-title">Zahlung bestätigen</h3>
+      <p class="text-xs text-slate-600 text-center mb-5" id="payment-modal-text">Möchtest du den Betrag als bar verbuchen?</p>
       <div class="flex gap-2">
-        <button id="payment-confirm-btn" class="flex-1 py-2.5 bg-aqua hover:bg-aqua-500 text-white rounded-xl font-bold text-xs">
-          Ja, als bezahlt markieren
+        <button id="payment-confirm-btn" class="flex-1 py-2.5 bg-cerulean hover:bg-cerulean-600 text-white rounded-xl font-bold text-xs transition">
+          Ja, verbuchen
         </button>
-        <button onclick="closePaymentModal()" class="px-4 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-xs">
+        <button onclick="closePaymentModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs transition">
           Abbrechen
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Admin PIN Authentication Modal -->
-  <div id="admin-pin-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-aqua-200 text-center">
-      <div class="w-12 h-12 rounded-2xl bg-peach-100 text-aqua-800 flex items-center justify-center text-2xl mx-auto mb-3 shadow-inner">
-        🔒
+  <!-- Admin PIN Modal -->
+  <div id="admin-pin-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-sm w-full p-6 shadow-2xl border border-cerulean-200 text-center">
+      <div class="w-12 h-12 rounded-2xl bg-cerulean-50 text-cerulean flex items-center justify-center mx-auto mb-3">
+        <i data-lucide="lock" class="w-6 h-6"></i>
       </div>
-      <h3 class="text-lg font-bold text-aqua-900">Admin-Zugang</h3>
-      <p class="text-xs text-gray-600 mb-4">Bitte gib den PIN für den organisierenden Kollegen ein.<br><span class="text-[11px] text-aqua-600 font-semibold">(Standard-PIN: 1234)</span></p>
+      <h3 class="text-lg font-bold text-slate-900">Admin-Zugang</h3>
+      <p class="text-xs text-slate-500 mb-4">Bitte gib den PIN für den organisierenden Kollegen ein.<br><span class="text-[11px] text-cerulean font-semibold">(Standard-PIN: 1234)</span></p>
 
       <div class="mb-4">
         <input type="password" id="admin-pin-input" maxlength="8" placeholder="PIN eingeben" 
           onkeydown="if(event.key==='Enter') submitAdminPin()"
-          class="w-full text-center text-xl tracking-widest font-bold py-2.5 px-4 rounded-xl border-2 border-aqua-200 focus:border-aqua focus:outline-none bg-aqua-50/30">
+          class="w-full text-center text-xl tracking-widest font-bold py-2.5 px-4 rounded-xl border-2 border-slate-200 focus:border-cerulean focus:outline-none bg-slate-50">
         <p id="admin-pin-error" class="text-xs text-red-500 font-semibold mt-1.5 hidden">Falscher PIN! Bitte erneut versuchen.</p>
       </div>
 
       <div class="flex gap-2">
-        <button onclick="submitAdminPin()" class="flex-1 py-3 bg-aqua hover:bg-aqua-500 text-white rounded-xl font-bold text-xs transition">
+        <button onclick="submitAdminPin()" class="flex-1 py-3 bg-cerulean hover:bg-cerulean-600 text-white rounded-xl font-bold text-xs transition">
           Entsperren
         </button>
-        <button onclick="closeAdminPinModal()" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-xs transition">
+        <button onclick="closeAdminPinModal()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs transition">
           Abbrechen
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Add / Edit Drink Modal -->
-  <div id="drink-edit-modal" class="fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 hidden">
-    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-aqua-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+  <!-- Getränk bearbeiten / anlegen Modal -->
+  <div id="drink-edit-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-cerulean-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-base font-bold text-aqua-900" id="drink-edit-modal-title">Getränk bearbeiten</h3>
-        <button onclick="closeDrinkEditModal()" class="text-gray-400 hover:text-aqua-900 p-1 rounded-full">
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2" id="drink-edit-modal-title">
+          <i data-lucide="package" class="w-4 h-4 text-cerulean"></i>
+          <span>Getränk bearbeiten</span>
+        </h3>
+        <button onclick="closeDrinkEditModal()" class="text-slate-400 hover:text-slate-700 p-1 rounded-full">
+          <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
@@ -492,48 +630,58 @@
         <input type="hidden" id="edit-drink-id">
 
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-1">Getränkename</label>
-          <input type="text" id="edit-drink-name" required placeholder="z. B. Mineralwasser Medium" class="w-full px-3.5 py-2.5 rounded-xl border border-aqua-200 focus:border-aqua focus:outline-none text-xs font-semibold">
+          <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-1">Getränkename</label>
+          <input type="text" id="edit-drink-name" required placeholder="z. B. Mineralwasser Medium" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs font-semibold">
         </div>
 
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-1">Icon / Emoji</label>
-            <input type="text" id="edit-drink-icon" required maxlength="4" placeholder="💧" class="w-full text-center px-3 py-2 rounded-xl border border-aqua-200 focus:border-aqua focus:outline-none text-lg">
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-1">Gebinde / Flasche</label>
-            <input type="text" id="edit-drink-unit" required placeholder="0,5L Glas" class="w-full px-3.5 py-2.5 rounded-xl border border-aqua-200 focus:border-aqua focus:outline-none text-xs">
-          </div>
-        </div>
-
-        <div class="grid grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-1">Preis (€)</label>
-            <input type="number" id="edit-drink-price" step="0.05" min="0.05" max="20" required class="w-full px-3.5 py-2.5 rounded-xl border border-aqua-200 focus:border-aqua focus:outline-none text-xs font-bold">
-          </div>
-          <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-1">Kistengröße</label>
-            <input type="number" id="edit-drink-crate" min="1" max="50" value="20" required class="w-full px-3.5 py-2.5 rounded-xl border border-aqua-200 focus:border-aqua focus:outline-none text-xs font-medium">
+        <!-- Bildauswahl / Preset oder URL -->
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-1">Flaschenbild (Pfad oder Preset)</label>
+          <div class="space-y-2">
+            <input type="text" id="edit-drink-image" required placeholder="assets/drinks/wasser.jpg oder Bild-URL" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs">
+            <div class="text-[11px] text-slate-500">Schnellauswahl Vorlagen:</div>
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
+              <button type="button" onclick="setPresetImage('assets/drinks/wasser.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Wasser</button>
+              <button type="button" onclick="setPresetImage('assets/drinks/apfelschorle.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Schorle</button>
+              <button type="button" onclick="setPresetImage('assets/drinks/saft.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Saft</button>
+              <button type="button" onclick="setPresetImage('assets/drinks/cola.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Cola/Spezi</button>
+              <button type="button" onclick="setPresetImage('assets/drinks/mate.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Mate</button>
+              <button type="button" onclick="setPresetImage('assets/drinks/bionade.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Bionade</button>
+            </div>
           </div>
         </div>
 
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-1">Aktueller Vorrat (Fl.)</label>
-            <input type="number" id="edit-drink-stock" min="0" max="999" required class="w-full px-3.5 py-2.5 rounded-xl border border-aqua-200 focus:border-aqua focus:outline-none text-xs font-bold text-aqua-900 bg-peach-50/50">
+            <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-1">Gebinde / Flasche</label>
+            <input type="text" id="edit-drink-unit" required placeholder="0,5L Glas" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs font-semibold">
           </div>
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-aqua-700 mb-1">Nachkauf-Schwelle</label>
-            <input type="number" id="edit-drink-threshold" min="1" max="100" required class="w-full px-3.5 py-2.5 rounded-xl border border-aqua-200 focus:border-aqua focus:outline-none text-xs font-medium">
+            <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-1">Preis (€)</label>
+            <input type="number" id="edit-drink-price" step="0.05" min="0.05" max="20" required class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs font-bold">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-3 gap-3">
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-1">Kistengröße</label>
+            <input type="number" id="edit-drink-crate" min="1" max="50" value="20" required class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs font-semibold">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-1">Aktueller Vorrat</label>
+            <input type="number" id="edit-drink-stock" min="0" max="999" required class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs font-bold text-cerulean-900 bg-cerulean-50/50">
+          </div>
+          <div>
+            <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-1">Mindestmenge</label>
+            <input type="number" id="edit-drink-threshold" min="1" max="100" required class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs font-semibold">
           </div>
         </div>
 
         <div class="flex gap-2 pt-2">
-          <button type="submit" class="flex-1 py-3 bg-aqua hover:bg-aqua-500 text-white rounded-xl font-bold text-xs transition">
+          <button type="submit" class="flex-1 py-3 bg-cerulean hover:bg-cerulean-600 text-white rounded-xl font-bold text-xs transition">
             Speichern
           </button>
-          <button type="button" onclick="closeDrinkEditModal()" class="px-4 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl font-semibold text-xs transition">
+          <button type="button" onclick="closeDrinkEditModal()" class="px-4 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl font-semibold text-xs transition">
             Abbrechen
           </button>
         </div>
@@ -541,37 +689,112 @@
     </div>
   </div>
 
+  <!-- Firebase Setup Modal -->
+  <div id="firebase-config-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center z-50 p-4 hidden">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-cerulean-200 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      <div class="flex justify-between items-center mb-3">
+        <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+          <i data-lucide="cloud" class="w-5 h-5 text-cerulean"></i>
+          <span>Firebase Cloud-Verbindung</span>
+        </h3>
+        <button onclick="closeFirebaseConfigModal()" class="text-slate-400 hover:text-slate-700 p-1 rounded-full">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <p class="text-xs text-slate-600 mb-4 leading-relaxed">
+        Trage hier deine Firebase-Projektdaten ein (aus der Firebase Console unter <em>Projekteinstellungen → Web-App</em>). Die Daten werden sicher im Browser gespeichert.
+      </p>
+
+      <div class="space-y-3 text-left">
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">
+            Tabellen-Präfix / Namensraum (Schutz vor Überschreiben)
+          </label>
+          <input type="text" id="firebase-prefix-input" placeholder="z. B. hbs_ oder getraenke_" value="hbs_"
+            class="w-full text-xs font-semibold px-3 py-2 rounded-xl border border-slate-300 focus:border-cerulean focus:outline-none bg-slate-50">
+          <p class="text-[10px] text-slate-500 mt-1">
+            <strong>Ideal für bestehende Firebase-Projekte:</strong> Deine Sammlungen heißen dann z. B. <code>hbs_drinks</code> und <code>hbs_bookings</code>. Bestehende Daten anderer Projekte bleiben zu 100 % getrennt und unberührt!
+          </p>
+        </div>
+
+        <div>
+          <label class="block text-[11px] font-bold text-slate-700 mb-1">Firebase Configuration (JSON-Objekt oder Einzelwerte)</label>
+          <textarea id="firebase-json-input" rows="6" placeholder='const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "getraenke-hbs.firebaseapp.com",
+  projectId: "getraenke-hbs",
+  storageBucket: "getraenke-hbs.firebasestorage.app",
+  messagingSenderId: "12345678",
+  appId: "1:12345:web:abcdef"
+};' class="w-full font-mono text-[11px] p-3 rounded-xl border border-slate-300 focus:border-cerulean focus:outline-none bg-slate-50"></textarea>
+        </div>
+
+        <div class="flex flex-wrap gap-2 pt-2">
+          <button onclick="saveFirebaseConfigFromInput()" class="flex-1 py-3 bg-cerulean hover:bg-cerulean-600 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="save" class="w-4 h-4"></i>
+            <span>Verbindung speichern & testen</span>
+          </button>
+          <button onclick="clearFirebaseConfig()" class="px-4 py-3 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl font-semibold text-xs flex items-center gap-1 transition">
+            <i data-lucide="trash" class="w-3.5 h-3.5"></i>
+            <span>Trennen (Lokaler Modus)</span>
+          </button>
+        </div>
+
+        <div class="p-3 bg-cerulean-50 rounded-xl border border-cerulean-100 text-[11px] text-cerulean-900 leading-relaxed">
+          <strong>Tipp:</strong> Wenn kein Firebase eingerichtet ist, arbeitet die App automatisch mit dem lokalen Speicher (LocalStorage) deines Browsers. Es gehen bei Seiten-Reloads keine Daten verloren!
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // Standard Drink catalog with initial stock levels & crate sizes
-    let DRINKS = [
-      { id: 'wasser', name: 'Mineralwasser', price: 0.50, icon: '💧', unit: '0,5L Flasche', restockThreshold: 10, stock: 24, crateSize: 20 },
-      { id: 'apfelschorle', name: 'Apfelschorle', price: 0.80, icon: '🍏', unit: '0,5L Flasche', restockThreshold: 8, stock: 16, crateSize: 20 },
-      { id: 'saft', name: 'Orangen-/Multisaft', price: 1.00, icon: '🍊', unit: '0,33L Glas', restockThreshold: 6, stock: 12, crateSize: 24 },
-      { id: 'cola', name: 'Cola / Spezi', price: 0.90, icon: '🥤', unit: '0,33L Dose/Fl.', restockThreshold: 6, stock: 14, crateSize: 24 },
-      { id: 'mate', name: 'Club-Mate / Tee', price: 1.00, icon: '🌿', unit: '0,5L Flasche', restockThreshold: 6, stock: 10, crateSize: 20 },
-      { id: 'bionade', name: 'Bionade / Limo', price: 1.00, icon: '🍋', unit: '0,33L Flasche', restockThreshold: 5, stock: 8, crateSize: 24 }
+    // ==========================================
+    // 1. Initialer Datenbestand & Standard-Sortiment
+    // ==========================================
+    const DEFAULT_DRINKS = [
+      { id: 'wasser', name: 'Mineralwasser Medium', price: 0.50, image: 'assets/drinks/wasser.jpg', unit: '0,5L Flasche', restockThreshold: 10, stock: 24, crateSize: 20 },
+      { id: 'apfelschorle', name: 'Apfelschorle Naturtrüb', price: 0.80, image: 'assets/drinks/apfelschorle.jpg', unit: '0,5L Flasche', restockThreshold: 8, stock: 16, crateSize: 20 },
+      { id: 'saft', name: 'Orangensaft / Mehrfrucht', price: 1.00, image: 'assets/drinks/saft.jpg', unit: '0,33L Flasche', restockThreshold: 6, stock: 12, crateSize: 24 },
+      { id: 'cola', name: 'Cola / Spezi Mix', price: 0.90, image: 'assets/drinks/cola.jpg', unit: '0,33L Flasche', restockThreshold: 6, stock: 14, crateSize: 24 },
+      { id: 'mate', name: 'Club-Mate / Tee', price: 1.00, image: 'assets/drinks/mate.jpg', unit: '0,5L Flasche', restockThreshold: 6, stock: 10, crateSize: 20 },
+      { id: 'bionade', name: 'Bio-Limonade Zitrone', price: 1.00, image: 'assets/drinks/bionade.jpg', unit: '0,33L Flasche', restockThreshold: 5, stock: 8, crateSize: 24 }
     ];
 
+    let DRINKS = [];
+    let entries = [];
     let adminPin = '1234';
     let isAdminUnlocked = false;
-
-    // Leere Buchungsliste (Demodaten entfernt)
-    let entries = [];
 
     let selectedDrinkId = 'wasser';
     let currentAmount = 1;
     let pendingPaymentPerson = null;
     let currentAdminSubTab = 'stock';
 
+    // ==========================================
+    // 2. Firebase & Storage Engine (Hybrid Architecture)
+    // ==========================================
+    let isFirebaseActive = false;
+    let db = null;
+    let collectionPrefix = localStorage.getItem('hbs_collection_prefix') || 'hbs_';
+    let unsubscribeDrinks = null;
+    let unsubscribeEntries = null;
+
+    function col(name) {
+      return db.collection(collectionPrefix + name);
+    }
+
     window.addEventListener('DOMContentLoaded', () => {
+      initIcons();
       initDateTimePicker();
-      renderDrinkGrid();
-      updateSelectedDrinkDetails();
-      updateQuickNamesList();
-      renderOverview();
-      renderHistoryLog();
-      renderPublicHistoryLog();
+      initStorageEngine();
     });
+
+    function initIcons() {
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    }
 
     function initDateTimePicker() {
       const now = new Date();
@@ -579,40 +802,238 @@
       document.getElementById('entry-date').value = now.toISOString().slice(0, 16);
     }
 
+    // Vorkonfigurierte Firebase-Verbindung zum Projekt "terminkalender-7f269"
+    // Nutzt den Namensraum "hbs_", damit Termine und Kalenderdaten 100% unberührt bleiben
+    const DEFAULT_FIREBASE_CONFIG = {
+      apiKey: "AIzaSyAr8Q3RslUSuaJbIIGiINGV24nm26jYoLQ",
+      authDomain: "terminkalender-7f269.firebaseapp.com",
+      projectId: "terminkalender-7f269",
+      storageBucket: "terminkalender-7f269.firebasestorage.app",
+      messagingSenderId: "919163141331",
+      appId: "1:919163141331:web:dfddc3b113349aac7e2826"
+    };
+
+    function initStorageEngine() {
+      // 1. Lade gespeicherten Admin-PIN
+      const savedPin = localStorage.getItem('hbs_admin_pin');
+      if (savedPin) adminPin = savedPin;
+
+      // 2. Prüfe Firebase Konfiguration (Nutze gespeicherte oder Standard-Konfiguration)
+      let configToUse = DEFAULT_FIREBASE_CONFIG;
+      const savedFirebaseConfig = localStorage.getItem('hbs_firebase_config');
+      if (savedFirebaseConfig) {
+        try {
+          configToUse = JSON.parse(savedFirebaseConfig);
+        } catch (e) {
+          console.warn("Fehler beim Parsen der benutzerdefinierten Firebase-Konfiguration, nutze Standard:", e);
+        }
+      }
+
+      if (configToUse && configToUse.projectId) {
+        initFirebase(configToUse);
+      } else {
+        initLocalStorageMode();
+      }
+    }
+
+    function initLocalStorageMode() {
+      isFirebaseActive = false;
+      updateSyncUI(false, "Lokaler Speicher aktiv (Offline)");
+
+      // Lade Drinks aus LocalStorage oder lade Standard-Katalog
+      const localDrinks = localStorage.getItem('hbs_drinks');
+      if (localDrinks) {
+        try {
+          DRINKS = JSON.parse(localDrinks);
+        } catch (e) {
+          DRINKS = [...DEFAULT_DRINKS];
+        }
+      } else {
+        DRINKS = [...DEFAULT_DRINKS];
+        saveLocalDrinks();
+      }
+
+      // Lade Buchungen aus LocalStorage
+      const localEntries = localStorage.getItem('hbs_entries');
+      if (localEntries) {
+        try {
+          entries = JSON.parse(localEntries);
+        } catch (e) {
+          entries = [];
+        }
+      } else {
+        entries = [];
+      }
+
+      refreshAllViews();
+    }
+
+    function saveLocalDrinks() {
+      if (!isFirebaseActive) {
+        localStorage.setItem('hbs_drinks', JSON.stringify(DRINKS));
+      }
+    }
+
+    function saveLocalEntries() {
+      if (!isFirebaseActive) {
+        localStorage.setItem('hbs_entries', JSON.stringify(entries));
+      }
+    }
+
+    function initFirebase(config) {
+      try {
+        if (!firebase.apps.length) {
+          firebase.initializeApp(config);
+        }
+        db = firebase.firestore();
+
+        // Offline Persistence aktivieren
+        db.enablePersistence({ synchronizeTabs: true }).catch(err => {
+          if (err.code !== 'failed-precondition' && err.code !== 'unimplemented') {
+            console.warn("Firestore Offline-Persistence konnte nicht aktiviert werden:", err);
+          }
+        });
+
+        isFirebaseActive = true;
+        updateSyncUI(true, "Cloud-Sync aktiv");
+
+        // Realtime Listener für Drinks
+        unsubscribeDrinks = col('drinks').onSnapshot(snapshot => {
+          if (!snapshot.empty) {
+            DRINKS = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          } else {
+            // Wenn Cloud-Sammlung noch leer ist, initiales Sortiment automatisch laden
+            DRINKS = [...DEFAULT_DRINKS];
+            seedInitialCatalogToCloud(false);
+          }
+          refreshAllViews();
+        }, err => {
+          console.error("Firestore Drinks Error:", err);
+          if (err.code === 'permission-denied') {
+            showToast("Regeln in Firebase nötig", "Zugriff verweigert. Bitte Firestore-Sicherheitsregeln freischalten.");
+          } else {
+            showToast("Cloud-Hinweis", "Verbindung unterbrochen. Lokaler Modus aktiv.");
+          }
+          initLocalStorageMode();
+        });
+
+        // Realtime Listener für Bookings
+        unsubscribeEntries = col('bookings').orderBy('timestamp', 'desc').onSnapshot(snapshot => {
+          entries = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          refreshAllViews();
+        }, err => {
+          console.error("Firestore Bookings Error:", err);
+        });
+
+      } catch (e) {
+        console.error("Firebase Initialisierungsfehler:", e);
+        initLocalStorageMode();
+        showToast("Firebase-Fehler", "Ungültige Konfiguration. Lokaler Modus aktiv.");
+      }
+    }
+
+    function updateSyncUI(connected, text) {
+      const dot = document.getElementById('sync-indicator-dot');
+      const statusText = document.getElementById('sync-status-text');
+      const badge = document.getElementById('settings-sync-badge');
+      const desc = document.getElementById('firebase-status-desc');
+
+      if (connected) {
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-emerald-400 animate-pulse";
+        if (statusText) statusText.textContent = "Cloud-Sync aktiv";
+        if (badge) {
+          badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200";
+          badge.textContent = "🟢 Cloud synchronisiert";
+        }
+        if (desc) desc.textContent = "Verbunden mit Firebase Firestore. Buchungen und Vorräte werden sekundengenau synchronisiert.";
+      } else {
+        if (dot) dot.className = "w-2 h-2 rounded-full bg-amber-400";
+        if (statusText) statusText.textContent = "Lokaler Speicher";
+        if (badge) {
+          badge.className = "px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-200";
+          badge.textContent = "🟡 Lokaler Speicher (Browser)";
+        }
+        if (desc) desc.textContent = "Aktuell werden Daten im Browser-Speicher (LocalStorage) gesichert. Für geräteübergreifenden Live-Sync bitte Firebase einbinden.";
+      }
+    }
+
+    function refreshAllViews() {
+      renderDrinkGrid();
+      updateSelectedDrinkDetails();
+      updateQuickNamesList();
+      renderOverview();
+      renderHistoryLog();
+      renderPublicHistoryLog();
+      if (isAdminUnlocked) renderAdminDashboard();
+      initIcons();
+    }
+
+    // ==========================================
+    // 3. UI Rendering: Getränkekacheln & Buchen
+    // ==========================================
     function renderDrinkGrid() {
       const grid = document.getElementById('drink-selector-grid');
+      if (!grid) return;
+
+      if (DRINKS.length === 0) {
+        grid.innerHTML = `<div class="col-span-full py-8 text-center text-slate-400 text-xs">Keine Getränke vorhanden.</div>`;
+        return;
+      }
+
+      // Falls aktuell gewähltes Getränk nicht mehr existiert
+      if (!DRINKS.some(d => d.id === selectedDrinkId)) {
+        selectedDrinkId = DRINKS[0].id;
+      }
+
       grid.innerHTML = DRINKS.map(drink => {
         const isSelected = drink.id === selectedDrinkId;
         const isSoldOut = drink.stock <= 0;
+        const isLow = drink.stock <= drink.restockThreshold && !isSoldOut;
+
         const borderClass = isSelected 
-          ? 'border-aqua bg-aqua-50 ring-2 ring-aqua/30' 
+          ? 'border-cerulean ring-2 ring-cerulean/30 shadow-md bg-white' 
           : isSoldOut 
-            ? 'border-gray-200 bg-gray-50 opacity-60' 
-            : 'border-gray-200 bg-white hover:border-peach-300';
-        const badgeColor = isSelected ? 'bg-aqua text-white' : 'bg-peach-100 text-aqua-900';
+            ? 'border-slate-200 bg-slate-50/70 opacity-60' 
+            : 'border-slate-200 bg-white hover:border-cerulean-300 hover:shadow-xs';
 
         return `
           <button type="button" onclick="selectDrink('${drink.id}')"
-            class="relative flex flex-col items-center justify-between p-3 rounded-2xl border-2 text-center transition-all ${borderClass}">
-            <!-- Live Stock indicator -->
-            <span class="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+            class="group relative flex flex-col items-center justify-between p-2.5 sm:p-3 rounded-2xl border-2 text-center transition-all ${borderClass}">
+            
+            <!-- Bestands-Badge -->
+            <span class="absolute top-2 right-2 text-[9px] font-bold px-1.5 py-0.5 rounded-full z-10 ${
               isSoldOut 
-                ? 'bg-red-100 text-red-700' 
-                : drink.stock <= drink.restockThreshold 
-                  ? 'bg-peach-200 text-aqua-900 font-extrabold' 
-                  : 'bg-aqua-50 text-aqua-700'
+                ? 'bg-rose-100 text-rose-700' 
+                : isLow 
+                  ? 'bg-amber-100 text-amber-800' 
+                  : 'bg-teal-50 text-teal-700 border border-teal-100'
             }">
               ${isSoldOut ? 'Aus!' : `${drink.stock} da`}
             </span>
-            <div class="text-2xl sm:text-3xl mb-1 mt-1">${drink.icon}</div>
-            <div class="font-bold text-xs sm:text-sm text-aqua-900 line-clamp-1">${drink.name}</div>
-            <div class="text-[10px] text-gray-500 mb-1">${drink.unit}</div>
-            <span class="text-[11px] font-extrabold px-2 py-0.5 rounded-full ${badgeColor}">
+
+            <!-- Hochwertiges Flaschenbild -->
+            <div class="w-full h-24 sm:h-28 flex items-center justify-center p-1 my-1 overflow-hidden">
+              <img src="${drink.image}" alt="${drink.name}" onerror="this.onerror=null; this.src='assets/drinks/wasser.jpg';"
+                class="max-h-full max-w-full object-contain drop-shadow-sm group-hover:scale-105 transition duration-200">
+            </div>
+
+            <!-- Name & Gebinde -->
+            <div class="w-full">
+              <div class="font-bold text-xs text-slate-900 line-clamp-1 leading-tight mb-0.5">${drink.name}</div>
+              <div class="text-[10px] text-slate-500 mb-1.5">${drink.unit || 'Flasche'}</div>
+            </div>
+
+            <!-- Preisschild -->
+            <span class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full w-full ${
+              isSelected ? 'bg-cerulean text-white' : 'bg-slate-100 text-slate-800 group-hover:bg-cerulean-50'
+            }">
               ${drink.price.toFixed(2).replace('.', ',')} €
             </span>
           </button>
         `;
       }).join('');
+
+      initIcons();
     }
 
     function selectDrink(drinkId) {
@@ -624,7 +1045,7 @@
     function updateSelectedDrinkDetails() {
       const drink = DRINKS.find(d => d.id === selectedDrinkId);
       if (!drink) return;
-      document.getElementById('selected-drink-price').textContent = `${drink.price.toFixed(2).replace('.', ',')} € pro Flasche (Vorrat: ${drink.stock} Fl.)`;
+      document.getElementById('selected-drink-price').textContent = `${drink.price.toFixed(2).replace('.', ',')} € (${drink.stock} Fl. vorrätig)`;
       const sum = (drink.price * currentAmount).toFixed(2).replace('.', ',');
       document.getElementById('booking-sum').textContent = `${sum} €`;
     }
@@ -643,16 +1064,17 @@
 
     function updateQuickNamesList() {
       const quickContainer = document.getElementById('quick-names');
+      if (!quickContainer) return;
       const uniqueNames = Array.from(new Set(entries.map(e => e.name))).slice(0, 5);
       
       if (uniqueNames.length === 0) {
-        quickContainer.innerHTML = `<span class="text-[11px] text-gray-400">Keine Vorlagen vorhanden</span>`;
+        quickContainer.innerHTML = `<span class="text-[11px] text-slate-400">Keine Vorlagen</span>`;
         return;
       }
 
       quickContainer.innerHTML = uniqueNames.map(name => `
         <button type="button" onclick="setQuickName('${name.replace(/'/g, "\\'")}')"
-          class="px-2.5 py-1 bg-peach-50 hover:bg-peach-100 text-aqua-900 border border-peach-200 rounded-lg text-xs font-semibold whitespace-nowrap transition">
+          class="px-2.5 py-1 bg-cerulean-50 hover:bg-cerulean-100 text-cerulean-900 border border-cerulean-200 rounded-lg text-xs font-semibold whitespace-nowrap transition">
           ${name}
         </button>
       `).join('');
@@ -662,7 +1084,7 @@
       document.getElementById('user-name').value = name;
     }
 
-    function handleFormSubmit(e) {
+    async function handleFormSubmit(e) {
       e.preventDefault();
       const nameInput = document.getElementById('user-name');
       const name = nameInput.value.trim();
@@ -678,15 +1100,12 @@
         return;
       }
 
-      // Deduct inventory
-      drink.stock -= currentAmount;
-
       const totalCost = Number((drink.price * currentAmount).toFixed(2));
-
       const newEntry = {
         id: 'e_' + Date.now(),
         name: name,
         drinkId: selectedDrinkId,
+        drinkName: drink.name,
         amount: currentAmount,
         pricePerUnit: drink.price,
         total: totalCost,
@@ -694,59 +1113,81 @@
         paid: false
       };
 
-      entries.unshift(newEntry);
+      if (isFirebaseActive && db) {
+        try {
+          // Cloud Firestore Batch / Transaction
+          const drinkRef = col('drinks').doc(drink.id);
+          const bookingRef = col('bookings').doc(newEntry.id);
 
-      // Reset form controls
+          await db.runTransaction(async (transaction) => {
+            const drinkDoc = await transaction.get(drinkRef);
+            if (!drinkDoc.exists) throw "Getränk existiert nicht in der Cloud";
+            const currentStock = drinkDoc.data().stock || 0;
+            if (currentStock < currentAmount) throw "Zu geringer Vorrat!";
+
+            transaction.update(drinkRef, { stock: currentStock - currentAmount });
+            transaction.set(bookingRef, newEntry);
+          });
+        } catch (err) {
+          console.error("Firestore Buchungsfehler:", err);
+          showToast("Fehler", "Cloud-Buchung fehlgeschlagen: " + err);
+          return;
+        }
+      } else {
+        // Lokaler Modus
+        drink.stock -= currentAmount;
+        entries.unshift(newEntry);
+        saveLocalDrinks();
+        saveLocalEntries();
+        refreshAllViews();
+      }
+
+      // Reset
       currentAmount = 1;
       document.getElementById('drink-amount').value = 1;
-      renderDrinkGrid();
       updateSelectedDrinkDetails();
       initDateTimePicker();
-      updateQuickNamesList();
-      renderOverview();
-      renderHistoryLog();
-      renderPublicHistoryLog();
-      if (isAdminUnlocked) renderAdminDashboard();
 
-      // Show friendly confirmation toast
-      showToast('Erfolgreich gebucht!', `${newEntry.amount}x ${drink.name} für ${name} hinterlegt.`);
+      showToast('Erfolgreich gebucht!', `${newEntry.amount}x ${drink.name} für ${name} erfasst.`);
     }
 
+    // ==========================================
+    // 4. Admin & Übersichten
+    // ==========================================
     function renderOverview() {
       const unpaidEntries = entries.filter(e => !e.paid);
       const openSum = unpaidEntries.reduce((acc, curr) => acc + curr.total, 0);
 
-      // Stat on Admin Bar
       const openSumEl = document.getElementById('admin-stat-open-sum');
       if (openSumEl) {
         openSumEl.textContent = `${openSum.toFixed(2).replace('.', ',')} €`;
       }
 
-      // Calculate consumption per drink
+      // Konsum nach Getränk berechnen
       const countsByDrink = {};
       entries.forEach(e => {
         countsByDrink[e.drinkId] = (countsByDrink[e.drinkId] || 0) + e.amount;
       });
 
-      // Restock List incorporating current stock vs minimum threshold
+      // Einkaufsliste
       const restockList = document.getElementById('restock-list');
       if (restockList) {
         restockList.innerHTML = DRINKS.map(drink => {
           const countTaken = countsByDrink[drink.id] || 0;
           const isUrgent = drink.stock <= drink.restockThreshold;
           return `
-            <div class="flex items-center justify-between p-3 rounded-xl border ${isUrgent ? 'bg-peach-50 border-peach-300' : 'bg-white border-gray-100'}">
-              <div class="flex items-center gap-2.5">
-                <span class="text-xl">${drink.icon}</span>
+            <div class="flex items-center justify-between p-3 rounded-2xl border ${isUrgent ? 'bg-amber-50/70 border-amber-300' : 'bg-white border-slate-100'}">
+              <div class="flex items-center gap-3">
+                <img src="${drink.image}" class="w-8 h-10 object-contain drop-shadow-xs" onerror="this.src='assets/drinks/wasser.jpg'">
                 <div>
-                  <div class="font-bold text-xs text-aqua-900">${drink.name}</div>
-                  <div class="text-[10px] text-gray-500">${drink.unit} • ${drink.price.toFixed(2).replace('.', ',')} €</div>
+                  <div class="font-bold text-xs text-slate-900">${drink.name}</div>
+                  <div class="text-[10px] text-slate-500">${drink.unit} • ${drink.price.toFixed(2).replace('.', ',')} €</div>
                 </div>
               </div>
               <div class="text-right">
-                <span class="text-sm font-black ${isUrgent ? 'text-peach-400' : 'text-aqua-800'}">Vorrat: ${drink.stock} Fl.</span>
-                <div class="text-[10px] font-semibold ${isUrgent ? 'text-red-500' : 'text-gray-400'}">
-                  ${isUrgent ? `⚠️ Nachkauf nötig (≤ ${drink.restockThreshold})` : `${countTaken} entnommen`}
+                <span class="text-sm font-extrabold ${isUrgent ? 'text-amber-700' : 'text-slate-800'}">Vorrat: ${drink.stock} Fl.</span>
+                <div class="text-[10px] font-semibold ${isUrgent ? 'text-rose-600 flex items-center gap-1 justify-end' : 'text-slate-400'}">
+                  ${isUrgent ? `<i data-lucide="alert-triangle" class="w-3 h-3"></i> Nachkauf nötig (≤ ${drink.restockThreshold})` : `${countTaken} entnommen`}
                 </div>
               </div>
             </div>
@@ -754,12 +1195,13 @@
         }).join('');
       }
 
-      // Colleague Balance Calculation
       renderColleagueBalances();
+      initIcons();
     }
 
     function renderColleagueBalances() {
       const container = document.getElementById('colleagues-balances');
+      if (!container) return;
       const balances = {};
 
       entries.forEach(e => {
@@ -777,7 +1219,7 @@
       const names = Object.keys(balances).sort((a, b) => balances[b].totalOwed - balances[a].totalOwed);
 
       if (names.length === 0) {
-        container.innerHTML = `<div class="text-xs text-gray-400 text-center py-4">Noch keine Kollegendaten erfasst.</div>`;
+        container.innerHTML = `<div class="text-xs text-slate-400 text-center py-6">Noch keine Kollegendaten erfasst.</div>`;
         return;
       }
 
@@ -790,52 +1232,72 @@
         }).join(', ');
 
         return `
-          <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3 rounded-2xl border ${hasOpenAmount ? 'bg-aqua-50/40 border-aqua-100' : 'bg-gray-50/50 border-gray-100'} gap-2">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl border ${hasOpenAmount ? 'bg-cerulean-50/50 border-cerulean-100' : 'bg-slate-50/60 border-slate-100'} gap-2">
             <div class="space-y-0.5">
               <div class="flex items-center gap-2">
-                <span class="font-bold text-xs text-aqua-900">${name}</span>
+                <span class="font-bold text-xs text-slate-900">${name}</span>
                 ${hasOpenAmount 
-                  ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-peach-200 text-aqua-900">Offen: ${data.totalOwed.toFixed(2).replace('.', ',')} €</span>`
-                  : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800">Alles beglichen ✓</span>`
+                  ? `<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-marigold text-white">Offen: ${data.totalOwed.toFixed(2).replace('.', ',')} €</span>`
+                  : `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-50 text-teal-700 border border-teal-200">Beglichen ✓</span>`
                 }
               </div>
-              <div class="text-[11px] text-gray-500">
-                ${hasOpenAmount ? `Offen: ${breakdown || 'Diverse'}` : `Bisher bezahlt: ${data.totalPaid.toFixed(2).replace('.', ',')} €`}
+              <div class="text-[11px] text-slate-500">
+                ${hasOpenAmount ? `Details: ${breakdown || 'Diverse'}` : `Bisher bezahlt: ${data.totalPaid.toFixed(2).replace('.', ',')} €`}
               </div>
             </div>
 
             ${hasOpenAmount ? `
               <button onclick="promptMarkPaid('${name.replace(/'/g, "\\'")}', ${data.totalOwed})"
-                class="self-end sm:self-center px-3 py-1.5 rounded-xl bg-aqua hover:bg-aqua-600 active:scale-95 text-white font-semibold text-xs transition shadow-xs">
-                Als bezahlt markieren
+                class="self-end sm:self-center px-3 py-1.5 rounded-xl bg-cerulean hover:bg-cerulean-600 active:scale-95 text-white font-semibold text-xs flex items-center gap-1.5 transition shadow-xs">
+                <i data-lucide="check" class="w-3.5 h-3.5"></i>
+                <span>Als bezahlt markieren</span>
               </button>
             ` : ''}
           </div>
         `;
       }).join('');
+
+      initIcons();
     }
 
     function promptMarkPaid(name, amount) {
       pendingPaymentPerson = name;
       document.getElementById('payment-modal-title').textContent = `Zahlung von ${name}`;
       document.getElementById('payment-modal-text').textContent = 
-        `Möchtest du den offenen Betrag in Höhe von ${amount.toFixed(2).replace('.', ',')} € für ${name} als bar/überwiesen verbuchen?`;
+        `Möchtest du den offenen Betrag in Höhe von ${amount.toFixed(2).replace('.', ',')} € für ${name} als beglichen verbuchen?`;
       document.getElementById('payment-confirm-btn').onclick = confirmPayment;
       document.getElementById('payment-modal').classList.remove('hidden');
     }
 
-    function confirmPayment() {
+    async function confirmPayment() {
       if (!pendingPaymentPerson) return;
-      entries.forEach(e => {
-        if (e.name === pendingPaymentPerson && !e.paid) {
-          e.paid = true;
+      const targetPerson = pendingPaymentPerson;
+
+      if (isFirebaseActive && db) {
+        try {
+          const batch = db.batch();
+          const targetEntries = entries.filter(e => e.name === targetPerson && !e.paid);
+          targetEntries.forEach(e => {
+            const ref = col('bookings').doc(e.id);
+            batch.update(ref, { paid: true, paidAt: new Date().toISOString() });
+          });
+          await batch.commit();
+        } catch (err) {
+          showToast("Fehler", "Cloud-Update fehlgeschlagen: " + err);
+          return;
         }
-      });
+      } else {
+        entries.forEach(e => {
+          if (e.name === targetPerson && !e.paid) {
+            e.paid = true;
+          }
+        });
+        saveLocalEntries();
+        refreshAllViews();
+      }
+
       closePaymentModal();
-      renderOverview();
-      renderHistoryLog();
-      renderPublicHistoryLog();
-      showToast('Zahlung verbucht', `Die Buchungen für ${pendingPaymentPerson} wurden als beglichen markiert.`);
+      showToast('Zahlung verbucht', `Buchungen für ${targetPerson} wurden als beglichen markiert.`);
       pendingPaymentPerson = null;
     }
 
@@ -843,184 +1305,9 @@
       document.getElementById('payment-modal').classList.add('hidden');
     }
 
-    function renderHistoryLog() {
-      const tbody = document.getElementById('history-table-body');
-      const emptyState = document.getElementById('empty-log-state');
-      const filter = (document.getElementById('log-search')?.value || '').toLowerCase();
-
-      const filtered = entries.filter(e => {
-        const drink = DRINKS.find(d => d.id === e.drinkId);
-        const drinkName = drink ? drink.name.toLowerCase() : '';
-        return e.name.toLowerCase().includes(filter) || drinkName.includes(filter);
-      });
-
-      if (filtered.length === 0) {
-        tbody.innerHTML = '';
-        emptyState.classList.remove('hidden');
-        return;
-      }
-      emptyState.classList.add('hidden');
-
-      tbody.innerHTML = filtered.map(e => {
-        const drink = DRINKS.find(d => d.id === e.drinkId);
-        const dateObj = new Date(e.timestamp);
-        const formattedDate = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + ' ' +
-                              dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
-
-        return `
-          <tr class="hover:bg-aqua-50/50 transition">
-            <td class="py-2.5 px-3 text-gray-500 whitespace-nowrap">${formattedDate}</td>
-            <td class="py-2.5 px-3 font-semibold text-aqua-900">${e.name}</td>
-            <td class="py-2.5 px-3">
-              <span class="inline-flex items-center gap-1.5">
-                <span>${drink ? drink.icon : '🥤'}</span>
-                <span>${drink ? drink.name : e.drinkId}</span>
-              </span>
-            </td>
-            <td class="py-2.5 px-3 text-center font-bold">${e.amount}</td>
-            <td class="py-2.5 px-3 text-right font-bold text-aqua-900">${e.total.toFixed(2).replace('.', ',')} €</td>
-            <td class="py-2.5 px-3 text-center">
-              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${e.paid ? 'bg-green-100 text-green-800' : 'bg-peach-200 text-aqua-900'}">
-                ${e.paid ? 'Bezahlt' : 'Offen'}
-              </span>
-            </td>
-            <td class="py-2.5 px-3 text-right">
-              <button onclick="deleteEntry('${e.id}')" title="Buchung löschen" class="text-gray-400 hover:text-red-500 p-1 transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                </svg>
-              </button>
-            </td>
-          </tr>
-        `;
-      }).join('');
-    }
-
-    function deleteEntry(id) {
-      entries = entries.filter(e => e.id !== id);
-      renderHistoryLog();
-      renderPublicHistoryLog();
-      renderOverview();
-      renderAdminDashboard();
-      showToast('Gelöscht', 'Buchung wurde entfernt.');
-    }
-
-    function toggleAdminMode() {
-      if (isAdminUnlocked) {
-        // Wenn bereits freigeschaltet, wechsle zwischen Buchung und Admin
-        const adminView = document.getElementById('view-admin');
-        if (adminView.classList.contains('hidden')) {
-          showAdminView();
-        } else {
-          returnToBookingView();
-        }
-      } else {
-        openAdminAccess();
-      }
-    }
-
-    function showAdminView() {
-      document.getElementById('view-book').classList.add('hidden');
-      document.getElementById('view-admin').classList.remove('hidden');
-      document.getElementById('admin-sub-nav').classList.remove('hidden');
-      document.getElementById('admin-header-text').textContent = 'Buchung öffnen';
-      renderAdminDashboard();
-      switchAdminSubTab(currentAdminSubTab);
-    }
-
-    function returnToBookingView() {
-      document.getElementById('view-admin').classList.add('hidden');
-      document.getElementById('admin-sub-nav').classList.add('hidden');
-      document.getElementById('view-book').classList.remove('hidden');
-      if (isAdminUnlocked) {
-        document.getElementById('admin-header-text').textContent = 'Admin-Zentrale';
-      }
-      renderDrinkGrid();
-      updateSelectedDrinkDetails();
-    }
-
-    function switchAdminSubTab(subTab) {
-      currentAdminSubTab = subTab;
-      const subTabs = ['stock', 'overview', 'log'];
-      subTabs.forEach(tab => {
-        const content = document.getElementById(`admin-tab-content-${tab}`);
-        const btn = document.getElementById(`tab-btn-admin-${tab}`);
-        if (tab === subTab) {
-          content.classList.remove('hidden');
-          btn.className = 'flex-1 py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 bg-aqua text-white shadow-sm';
-        } else {
-          content.classList.add('hidden');
-          btn.className = 'flex-1 py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 text-aqua-700 hover:bg-peach-50';
-        }
-      });
-
-      if (subTab === 'stock') renderAdminDashboard();
-      if (subTab === 'overview') renderOverview();
-      if (subTab === 'log') renderHistoryLog();
-    }
-
-    function openAdminAccess() {
-      if (isAdminUnlocked) {
-        showAdminView();
-      } else {
-        document.getElementById('admin-pin-error').classList.add('hidden');
-        document.getElementById('admin-pin-input').value = '';
-        document.getElementById('admin-pin-modal').classList.remove('hidden');
-        setTimeout(() => document.getElementById('admin-pin-input').focus(), 150);
-      }
-    }
-
-    function closeAdminPinModal() {
-      document.getElementById('admin-pin-modal').classList.add('hidden');
-    }
-
-    function submitAdminPin() {
-      const input = document.getElementById('admin-pin-input').value.trim();
-      if (input === adminPin) {
-        isAdminUnlocked = true;
-        closeAdminPinModal();
-        document.getElementById('admin-lock-icon').textContent = '🔓';
-        showAdminView();
-        showToast('Admin freigeschaltet', 'Willkommen im Verwaltungs-Dashboard!');
-      } else {
-        document.getElementById('admin-pin-error').classList.remove('hidden');
-        document.getElementById('admin-pin-input').select();
-      }
-    }
-
-    function lockAdmin() {
-      isAdminUnlocked = false;
-      document.getElementById('admin-lock-icon').textContent = '🔒';
-      document.getElementById('admin-header-text').textContent = 'Admin-Bereich';
-      returnToBookingView();
-      showToast('Admin abgemeldet', 'Der Verwaltungsbereich wurde wieder gesperrt.');
-    }
-
-    function changeAdminPin() {
-      const newPin = document.getElementById('new-admin-pin').value.trim();
-      if (newPin.length >= 4) {
-        adminPin = newPin;
-        document.getElementById('new-admin-pin').value = '';
-        showToast('PIN geändert', `Neuer Admin-PIN ist nun aktiv.`);
-      } else {
-        showToast('Ungültiger PIN', 'Der PIN muss mindestens 4 Zeichen umfassen.');
-      }
-    }
-
-    function archivePaidBookings() {
-      const paidCount = entries.filter(e => e.paid).length;
-      if (paidCount === 0) {
-        showToast('Keine Einträge', 'Es gibt derzeit keine bezahlten Buchungen zum Bereinigen.');
-        return;
-      }
-      entries = entries.filter(e => !e.paid);
-      renderOverview();
-      renderHistoryLog();
-      renderPublicHistoryLog();
-      renderAdminDashboard();
-      showToast('Kassenschnitt durchgeführt', `${paidCount} bezahlte Buchungen wurden archiviert.`);
-    }
-
+    // ==========================================
+    // 5. Historie Tabellen
+    // ==========================================
     function renderPublicHistoryLog() {
       const tbody = document.getElementById('public-history-table-body');
       const emptyState = document.getElementById('public-empty-log-state');
@@ -1030,7 +1317,7 @@
 
       const filtered = entries.filter(e => {
         const drink = DRINKS.find(d => d.id === e.drinkId);
-        const drinkName = drink ? drink.name.toLowerCase() : '';
+        const drinkName = drink ? drink.name.toLowerCase() : (e.drinkName || '').toLowerCase();
         return e.name.toLowerCase().includes(filter) || drinkName.includes(filter);
       });
 
@@ -1048,19 +1335,19 @@
                               dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
 
         return `
-          <tr class="hover:bg-aqua-50/40 transition">
-            <td class="py-2.5 px-3 text-gray-500 whitespace-nowrap">${formattedDate}</td>
-            <td class="py-2.5 px-3 font-semibold text-aqua-900">${e.name}</td>
+          <tr class="hover:bg-cerulean-50/40 transition">
+            <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${formattedDate}</td>
+            <td class="py-2.5 px-3 font-semibold text-slate-900">${e.name}</td>
             <td class="py-2.5 px-3">
-              <span class="inline-flex items-center gap-1.5">
-                <span>${drink ? drink.icon : '🥤'}</span>
-                <span>${drink ? drink.name : e.drinkId}</span>
+              <span class="inline-flex items-center gap-2">
+                <img src="${drink ? drink.image : 'assets/drinks/wasser.jpg'}" class="w-4 h-5 object-contain" onerror="this.src='assets/drinks/wasser.jpg'">
+                <span>${drink ? drink.name : (e.drinkName || e.drinkId)}</span>
               </span>
             </td>
             <td class="py-2.5 px-3 text-center font-bold">${e.amount}</td>
-            <td class="py-2.5 px-3 text-right font-bold text-aqua-900">${e.total.toFixed(2).replace('.', ',')} €</td>
+            <td class="py-2.5 px-3 text-right font-extrabold text-slate-900">${e.total.toFixed(2).replace('.', ',')} €</td>
             <td class="py-2.5 px-3 text-center">
-              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.paid ? 'bg-green-100 text-green-800' : 'bg-peach-200 text-aqua-900'}">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.paid ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-marigold text-white'}">
                 ${e.paid ? 'Bezahlt ✓' : 'Offen'}
               </span>
             </td>
@@ -1069,8 +1356,87 @@
       }).join('');
     }
 
+    function renderHistoryLog() {
+      const tbody = document.getElementById('history-table-body');
+      const emptyState = document.getElementById('empty-log-state');
+      if (!tbody) return;
+
+      const filter = (document.getElementById('log-search')?.value || '').toLowerCase();
+
+      const filtered = entries.filter(e => {
+        const drink = DRINKS.find(d => d.id === e.drinkId);
+        const drinkName = drink ? drink.name.toLowerCase() : (e.drinkName || '').toLowerCase();
+        return e.name.toLowerCase().includes(filter) || drinkName.includes(filter);
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyState?.classList.remove('hidden');
+        return;
+      }
+      emptyState?.classList.add('hidden');
+
+      tbody.innerHTML = filtered.map(e => {
+        const drink = DRINKS.find(d => d.id === e.drinkId);
+        const dateObj = new Date(e.timestamp);
+        const formattedDate = dateObj.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) + ' ' +
+                              dateObj.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+
+        return `
+          <tr class="hover:bg-cerulean-50/50 transition">
+            <td class="py-2.5 px-3 text-slate-500 whitespace-nowrap">${formattedDate}</td>
+            <td class="py-2.5 px-3 font-semibold text-slate-900">${e.name}</td>
+            <td class="py-2.5 px-3">
+              <span class="inline-flex items-center gap-2">
+                <img src="${drink ? drink.image : 'assets/drinks/wasser.jpg'}" class="w-4 h-5 object-contain" onerror="this.src='assets/drinks/wasser.jpg'">
+                <span>${drink ? drink.name : (e.drinkName || e.drinkId)}</span>
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-center font-bold">${e.amount}</td>
+            <td class="py-2.5 px-3 text-right font-bold text-slate-900">${e.total.toFixed(2).replace('.', ',')} €</td>
+            <td class="py-2.5 px-3 text-center">
+              <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold ${e.paid ? 'bg-teal-50 text-teal-700 border border-teal-200' : 'bg-marigold text-white'}">
+                ${e.paid ? 'Bezahlt' : 'Offen'}
+              </span>
+            </td>
+            <td class="py-2.5 px-3 text-right">
+              <button onclick="deleteEntry('${e.id}')" title="Buchung löschen" class="text-slate-400 hover:text-rose-600 p-1 transition">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      initIcons();
+    }
+
+    async function deleteEntry(id) {
+      if (!confirm("Möchtest du diesen Eintrag wirklich löschen?")) return;
+
+      if (isFirebaseActive && db) {
+        try {
+          await col('bookings').doc(id).delete();
+        } catch (err) {
+          showToast("Fehler", "Cloud-Löschen fehlgeschlagen: " + err);
+          return;
+        }
+      } else {
+        entries = entries.filter(e => e.id !== id);
+        saveLocalEntries();
+        refreshAllViews();
+      }
+
+      showToast('Gelöscht', 'Buchung wurde entfernt.');
+    }
+
+    // ==========================================
+    // 6. Admin Dashboard & Sortimentspflege
+    // ==========================================
     function renderAdminDashboard() {
       const container = document.getElementById('admin-drinks-container');
+      if (!container) return;
+
       const totalStock = DRINKS.reduce((sum, d) => sum + d.stock, 0);
       const lowStockCount = DRINKS.filter(d => d.stock <= d.restockThreshold).length;
       const unpaidEntries = entries.filter(e => !e.paid);
@@ -1086,80 +1452,100 @@
         const crate = drink.crateSize || 20;
 
         return `
-          <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-3.5 rounded-2xl border ${isLow ? 'bg-peach-50/60 border-peach-300' : 'bg-aqua-50/30 border-aqua-100'} gap-3">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between p-3.5 rounded-2xl border ${isLow ? 'bg-amber-50/50 border-amber-200' : 'bg-white border-slate-200/80'} gap-3">
             <div class="flex items-center gap-3">
-              <span class="text-3xl p-1.5 bg-white rounded-xl shadow-xs">${drink.icon}</span>
+              <div class="w-12 h-14 bg-slate-50 rounded-xl p-1 flex items-center justify-center shrink-0 border border-slate-100">
+                <img src="${drink.image}" class="max-h-full max-w-full object-contain drop-shadow-xs" onerror="this.src='assets/drinks/wasser.jpg'">
+              </div>
               <div>
                 <div class="flex items-center gap-2">
-                  <h4 class="font-bold text-sm text-aqua-900">${drink.name}</h4>
-                  <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-white border border-aqua-200 text-aqua-800">
+                  <h4 class="font-bold text-sm text-slate-900">${drink.name}</h4>
+                  <span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-cerulean-50 border border-cerulean-200 text-cerulean-800">
                     ${drink.price.toFixed(2).replace('.', ',')} €
                   </span>
                 </div>
-                <div class="text-[11px] text-gray-500">
+                <div class="text-[11px] text-slate-500">
                   ${drink.unit} • Nachkauf-Schwelle: ≤ ${drink.restockThreshold} Fl.
                 </div>
               </div>
             </div>
 
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto justify-between md:justify-end">
-              <!-- Stock Control Stepper -->
-              <div class="flex items-center gap-1.5 bg-white px-2 py-1 rounded-xl border border-aqua-200 shadow-xs">
-                <span class="text-xs font-bold text-aqua-800 mr-1">Bestand:</span>
-                <button type="button" onclick="modifyStock('${drink.id}', -1)" class="w-6 h-6 rounded-md bg-gray-100 hover:bg-peach-100 text-aqua-900 font-bold text-xs leading-none">
+              <!-- Stepper -->
+              <div class="flex items-center gap-1.5 bg-slate-50 px-2 py-1 rounded-xl border border-slate-200 shadow-xs">
+                <span class="text-xs font-bold text-slate-700 mr-1">Bestand:</span>
+                <button type="button" onclick="modifyStock('${drink.id}', -1)" class="w-6 h-6 rounded-md bg-white hover:bg-slate-200 text-slate-900 font-bold text-xs flex items-center justify-center">
                   –
                 </button>
-                <span class="font-black text-sm px-1.5 ${isLow ? 'text-red-500' : 'text-aqua-900'}">
+                <span class="font-extrabold text-sm px-1.5 ${isLow ? 'text-amber-700' : 'text-slate-900'}">
                   ${drink.stock}
                 </span>
-                <button type="button" onclick="modifyStock('${drink.id}', 1)" class="w-6 h-6 rounded-md bg-gray-100 hover:bg-peach-100 text-aqua-900 font-bold text-xs leading-none">
+                <button type="button" onclick="modifyStock('${drink.id}', 1)" class="w-6 h-6 rounded-md bg-white hover:bg-slate-200 text-slate-900 font-bold text-xs flex items-center justify-center">
                   +
                 </button>
               </div>
 
-              <!-- Fast Restock: Add Crate -->
-              <button onclick="modifyStock('${drink.id}', ${crate})" class="px-2.5 py-1.5 rounded-xl bg-aqua hover:bg-aqua-500 text-white font-semibold text-xs flex items-center gap-1 shadow-xs transition">
-                <span>📦</span>
+              <!-- +1 Kiste -->
+              <button onclick="modifyStock('${drink.id}', ${crate})" class="px-2.5 py-1.5 rounded-xl bg-cerulean hover:bg-cerulean-600 text-white font-semibold text-xs flex items-center gap-1 shadow-xs transition">
+                <i data-lucide="package" class="w-3.5 h-3.5"></i>
                 <span>+1 Kiste (+${crate})</span>
               </button>
 
               <!-- Edit & Delete -->
               <div class="flex items-center gap-1">
-                <button onclick="openEditDrinkModal('${drink.id}')" title="Getränk bearbeiten" class="p-1.5 rounded-lg bg-gray-100 hover:bg-gray-200 text-gray-700 transition">
-                  ✏️
+                <button onclick="openEditDrinkModal('${drink.id}')" title="Getränk bearbeiten" class="p-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+                  <i data-lucide="pencil" class="w-3.5 h-3.5"></i>
                 </button>
-                <button onclick="deleteDrink('${drink.id}')" title="Getränk entfernen" class="p-1.5 rounded-lg bg-gray-100 hover:bg-red-100 text-gray-400 hover:text-red-600 transition">
-                  🗑️
+                <button onclick="deleteDrink('${drink.id}')" title="Getränk entfernen" class="p-1.5 rounded-lg bg-slate-100 hover:bg-rose-100 text-slate-400 hover:text-rose-600 transition">
+                  <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
                 </button>
               </div>
             </div>
           </div>
         `;
       }).join('');
+
+      initIcons();
     }
 
-    function modifyStock(drinkId, delta) {
+    async function modifyStock(drinkId, delta) {
       const drink = DRINKS.find(d => d.id === drinkId);
       if (!drink) return;
-      drink.stock = Math.max(0, drink.stock + delta);
-      renderAdminDashboard();
-      renderDrinkGrid();
-      renderOverview();
-      showToast('Bestand aktualisiert', `${drink.name}: Jetzt ${drink.stock} Flaschen im Fundus.`);
+      const newStock = Math.max(0, drink.stock + delta);
+
+      if (isFirebaseActive && db) {
+        try {
+          await col('drinks').doc(drinkId).update({ stock: newStock });
+        } catch (err) {
+          showToast("Fehler", "Cloud-Update fehlgeschlagen: " + err);
+          return;
+        }
+      } else {
+        drink.stock = newStock;
+        saveLocalDrinks();
+        refreshAllViews();
+      }
+
+      showToast('Bestand aktualisiert', `${drink.name}: Jetzt ${newStock} Flaschen.`);
+    }
+
+    function setPresetImage(path) {
+      document.getElementById('edit-drink-image').value = path;
     }
 
     function openAddDrinkModal() {
-      document.getElementById('drink-edit-modal-title').textContent = 'Neues Getränk hinzufügen';
+      document.getElementById('drink-edit-modal-title').textContent = 'Neues Getränk anlegen';
       document.getElementById('edit-drink-id').value = '';
       document.getElementById('edit-drink-name').value = '';
-      document.getElementById('edit-drink-icon').value = '🥤';
-      document.getElementById('edit-drink-unit').value = '0,5L Flasche';
+      document.getElementById('edit-drink-image').value = 'assets/drinks/wasser.jpg';
+      document.getElementById('edit-drink-unit').value = '0,5L Glasflasche';
       document.getElementById('edit-drink-price').value = '1.00';
       document.getElementById('edit-drink-crate').value = '20';
       document.getElementById('edit-drink-stock').value = '20';
       document.getElementById('edit-drink-threshold').value = '6';
 
       document.getElementById('drink-edit-modal').classList.remove('hidden');
+      initIcons();
     }
 
     function openEditDrinkModal(drinkId) {
@@ -1169,7 +1555,7 @@
       document.getElementById('drink-edit-modal-title').textContent = `${drink.name} bearbeiten`;
       document.getElementById('edit-drink-id').value = drink.id;
       document.getElementById('edit-drink-name').value = drink.name;
-      document.getElementById('edit-drink-icon').value = drink.icon;
+      document.getElementById('edit-drink-image').value = drink.image || 'assets/drinks/wasser.jpg';
       document.getElementById('edit-drink-unit').value = drink.unit;
       document.getElementById('edit-drink-price').value = drink.price.toFixed(2);
       document.getElementById('edit-drink-crate').value = drink.crateSize || 20;
@@ -1177,17 +1563,18 @@
       document.getElementById('edit-drink-threshold').value = drink.restockThreshold;
 
       document.getElementById('drink-edit-modal').classList.remove('hidden');
+      initIcons();
     }
 
     function closeDrinkEditModal() {
       document.getElementById('drink-edit-modal').classList.add('hidden');
     }
 
-    function saveDrinkDetails(e) {
+    async function saveDrinkDetails(e) {
       e.preventDefault();
       const id = document.getElementById('edit-drink-id').value;
       const name = document.getElementById('edit-drink-name').value.trim();
-      const icon = document.getElementById('edit-drink-icon').value.trim() || '🥤';
+      const image = document.getElementById('edit-drink-image').value.trim() || 'assets/drinks/wasser.jpg';
       const unit = document.getElementById('edit-drink-unit').value.trim();
       const price = parseFloat(document.getElementById('edit-drink-price').value) || 0.50;
       const crateSize = parseInt(document.getElementById('edit-drink-crate').value) || 20;
@@ -1196,85 +1583,315 @@
 
       if (!name) return;
 
-      if (id) {
-        // Edit existing drink
-        const drink = DRINKS.find(d => d.id === id);
-        if (drink) {
-          drink.name = name;
-          drink.icon = icon;
-          drink.unit = unit;
-          drink.price = price;
-          drink.crateSize = crateSize;
-          drink.stock = stock;
-          drink.restockThreshold = restockThreshold;
+      const drinkData = { name, image, unit, price, crateSize, stock, restockThreshold };
+
+      if (isFirebaseActive && db) {
+        try {
+          if (id) {
+            await col('drinks').doc(id).update(drinkData);
+            showToast('Gespeichert', `${name} wurde aktualisiert.`);
+          } else {
+            const newDoc = col('drinks').doc();
+            await newDoc.set(drinkData);
+            showToast('Hinzugefügt', `${name} ist jetzt im Fundus auswählbar!`);
+          }
+        } catch (err) {
+          showToast("Fehler", "Speichern fehlgeschlagen: " + err);
+          return;
         }
-        showToast('Gespeichert', `${name} wurde aktualisiert.`);
       } else {
-        // Create new drink
-        const newId = 'drink_' + Date.now();
-        DRINKS.push({
-          id: newId,
-          name,
-          icon,
-          unit,
-          price,
-          crateSize,
-          stock,
-          restockThreshold
-        });
-        showToast('Hinzugefügt', `${name} ist jetzt im Fundus auswählbar!`);
+        if (id) {
+          const drink = DRINKS.find(d => d.id === id);
+          if (drink) Object.assign(drink, drinkData);
+          showToast('Gespeichert', `${name} wurde aktualisiert.`);
+        } else {
+          const newId = 'drink_' + Date.now();
+          DRINKS.push({ id: newId, ...drinkData });
+          showToast('Hinzugefügt', `${name} ist jetzt im Fundus auswählbar!`);
+        }
+        saveLocalDrinks();
+        refreshAllViews();
       }
 
       closeDrinkEditModal();
-      renderAdminDashboard();
-      renderDrinkGrid();
-      updateSelectedDrinkDetails();
-      renderOverview();
     }
 
-    function deleteDrink(drinkId) {
+    async function deleteDrink(drinkId) {
       if (DRINKS.length <= 1) {
         showToast('Hinweis', 'Mindestens ein Getränk muss im Sortiment verbleiben.');
         return;
       }
-      const drink = DRINKS.find(d => d.id === drinkId);
-      DRINKS = DRINKS.filter(d => d.id !== drinkId);
-      if (selectedDrinkId === drinkId) {
-        selectedDrinkId = DRINKS[0].id;
+      if (!confirm("Möchtest du dieses Getränk wirklich aus dem Sortiment löschen?")) return;
+
+      if (isFirebaseActive && db) {
+        try {
+          await col('drinks').doc(drinkId).delete();
+        } catch (err) {
+          showToast("Fehler", "Löschen fehlgeschlagen: " + err);
+          return;
+        }
+      } else {
+        DRINKS = DRINKS.filter(d => d.id !== drinkId);
+        if (selectedDrinkId === drinkId) selectedDrinkId = DRINKS[0].id;
+        saveLocalDrinks();
+        refreshAllViews();
       }
-      renderAdminDashboard();
-      renderDrinkGrid();
-      updateSelectedDrinkDetails();
-      renderOverview();
-      showToast('Entfernt', `${drink ? drink.name : 'Getränk'} wurde aus dem Sortiment gelöscht.`);
+
+      showToast('Entfernt', 'Getränk wurde gelöscht.');
     }
 
-    function switchTab(tab) {
-      document.getElementById('view-book').classList.add('hidden');
-      document.getElementById('view-overview').classList.add('hidden');
-      document.getElementById('view-log').classList.add('hidden');
-
-      const tabs = ['book', 'overview', 'log'];
-      tabs.forEach(t => {
-        const btn = document.getElementById(`tab-btn-${t}`);
-        if (t === tab) {
-          btn.className = 'flex-1 py-2.5 px-3 rounded-xl font-semibold text-sm transition-all text-center flex items-center justify-center gap-2 bg-aqua text-white shadow-sm';
+    // ==========================================
+    // 7. Navigation & Modals
+    // ==========================================
+    function toggleAdminMode() {
+      if (isAdminUnlocked) {
+        const adminView = document.getElementById('view-admin');
+        if (adminView.classList.contains('hidden')) {
+          showAdminView();
         } else {
-          btn.className = 'flex-1 py-2.5 px-3 rounded-xl font-semibold text-sm transition-all text-center flex items-center justify-center gap-2 text-aqua-700 hover:bg-peach-50';
+          returnToBookingView();
+        }
+      } else {
+        openAdminAccess();
+      }
+    }
+
+    function showAdminView() {
+      document.getElementById('view-book').classList.add('hidden');
+      document.getElementById('view-admin').classList.remove('hidden');
+      document.getElementById('admin-sub-nav').classList.remove('hidden');
+      document.getElementById('admin-header-text').textContent = 'Buchen';
+      document.getElementById('admin-header-icon').setAttribute('data-lucide', 'arrow-left');
+      renderAdminDashboard();
+      switchAdminSubTab(currentAdminSubTab);
+      initIcons();
+    }
+
+    function returnToBookingView() {
+      document.getElementById('view-admin').classList.add('hidden');
+      document.getElementById('admin-sub-nav').classList.add('hidden');
+      document.getElementById('view-book').classList.remove('hidden');
+      if (isAdminUnlocked) {
+        document.getElementById('admin-header-text').textContent = 'Admin';
+        document.getElementById('admin-header-icon').setAttribute('data-lucide', 'unlock');
+      } else {
+        document.getElementById('admin-header-text').textContent = 'Admin';
+        document.getElementById('admin-header-icon').setAttribute('data-lucide', 'lock');
+      }
+      refreshAllViews();
+      initIcons();
+    }
+
+    function switchAdminSubTab(subTab) {
+      currentAdminSubTab = subTab;
+      const subTabs = ['stock', 'overview', 'log', 'settings'];
+      subTabs.forEach(tab => {
+        const content = document.getElementById(`admin-tab-content-${tab}`);
+        const btn = document.getElementById(`tab-btn-admin-${tab}`);
+        if (!content || !btn) return;
+        if (tab === subTab) {
+          content.classList.remove('hidden');
+          btn.className = 'flex-1 min-w-[120px] py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 bg-cerulean text-white shadow-xs';
+        } else {
+          content.classList.add('hidden');
+          btn.className = 'flex-1 min-w-[120px] py-2 px-3 rounded-xl font-semibold text-xs transition-all text-center flex items-center justify-center gap-1.5 text-slate-700 hover:bg-cerulean-50';
         }
       });
 
-      document.getElementById(`view-${tab}`).classList.remove('hidden');
-
-      if (tab === 'overview') renderOverview();
-      if (tab === 'log') renderHistoryLog();
+      if (subTab === 'stock') renderAdminDashboard();
+      if (subTab === 'overview') renderOverview();
+      if (subTab === 'log') renderHistoryLog();
+      initIcons();
     }
 
+    function openAdminAccess() {
+      if (isAdminUnlocked) {
+        showAdminView();
+      } else {
+        document.getElementById('admin-pin-error').classList.add('hidden');
+        document.getElementById('admin-pin-input').value = '';
+        document.getElementById('admin-pin-modal').classList.remove('hidden');
+        setTimeout(() => document.getElementById('admin-pin-input').focus(), 150);
+        initIcons();
+      }
+    }
+
+    function closeAdminPinModal() {
+      document.getElementById('admin-pin-modal').classList.add('hidden');
+    }
+
+    function submitAdminPin() {
+      const input = document.getElementById('admin-pin-input').value.trim();
+      if (input === adminPin) {
+        isAdminUnlocked = true;
+        closeAdminPinModal();
+        showAdminView();
+        showToast('Admin freigeschaltet', 'Willkommen im Verwaltungs-Dashboard!');
+      } else {
+        document.getElementById('admin-pin-error').classList.remove('hidden');
+        document.getElementById('admin-pin-input').select();
+      }
+    }
+
+    function lockAdmin() {
+      isAdminUnlocked = false;
+      document.getElementById('admin-header-icon').setAttribute('data-lucide', 'lock');
+      document.getElementById('admin-header-text').textContent = 'Admin';
+      returnToBookingView();
+      showToast('Admin abgemeldet', 'Der Verwaltungsbereich wurde gesperrt.');
+    }
+
+    function changeAdminPin() {
+      const newPin = document.getElementById('new-admin-pin').value.trim();
+      if (newPin.length >= 4) {
+        adminPin = newPin;
+        localStorage.setItem('hbs_admin_pin', adminPin);
+        document.getElementById('new-admin-pin').value = '';
+        showToast('PIN geändert', 'Neuer Admin-PIN ist nun aktiv.');
+      } else {
+        showToast('Ungültiger PIN', 'Der PIN muss mindestens 4 Ziffern umfassen.');
+      }
+    }
+
+    async function archivePaidBookings() {
+      const paidCount = entries.filter(e => e.paid).length;
+      if (paidCount === 0) {
+        showToast('Keine Einträge', 'Es gibt derzeit keine bezahlten Buchungen zum Bereinigen.');
+        return;
+      }
+      if (!confirm(`Möchtest du ${paidCount} bereits bezahlte Buchungen aus der Live-Anzeige archivieren?`)) return;
+
+      if (isFirebaseActive && db) {
+        try {
+          const batch = db.batch();
+          const paidEntries = entries.filter(e => e.paid);
+          paidEntries.forEach(e => {
+            batch.delete(col('bookings').doc(e.id));
+          });
+          await batch.commit();
+        } catch (err) {
+          showToast("Fehler", "Archivieren fehlgeschlagen: " + err);
+          return;
+        }
+      } else {
+        entries = entries.filter(e => !e.paid);
+        saveLocalEntries();
+        refreshAllViews();
+      }
+
+      showToast('Kassenschnitt erledigt', `${paidCount} bezahlte Buchungen archiviert.`);
+    }
+
+    // ==========================================
+    // 8. Firebase Configuration Helpers
+    // ==========================================
+    function openFirebaseConfigModal() {
+      const textarea = document.getElementById('firebase-json-input');
+      const prefixInput = document.getElementById('firebase-prefix-input');
+      if (prefixInput) prefixInput.value = collectionPrefix;
+
+      const saved = localStorage.getItem('hbs_firebase_config');
+      if (saved) {
+        try {
+          textarea.value = JSON.stringify(JSON.parse(saved), null, 2);
+        } catch (e) {
+          textarea.value = saved;
+        }
+      } else {
+        textarea.value = JSON.stringify(DEFAULT_FIREBASE_CONFIG, null, 2);
+      }
+      document.getElementById('firebase-config-modal').classList.remove('hidden');
+      initIcons();
+    }
+
+    function closeFirebaseConfigModal() {
+      document.getElementById('firebase-config-modal').classList.add('hidden');
+    }
+
+    function saveFirebaseConfigFromInput() {
+      const raw = document.getElementById('firebase-json-input').value.trim();
+      const prefixInput = document.getElementById('firebase-prefix-input');
+      const prefixVal = (prefixInput ? prefixInput.value.trim() : '') || 'hbs_';
+
+      if (!raw) {
+        clearFirebaseConfig();
+        return;
+      }
+
+      let parsedConfig = null;
+      try {
+        // Bereinigt evtl. vorangestelltes 'const firebaseConfig = ' oder ';'
+        let clean = raw.replace(/^const\s+firebaseConfig\s*=\s*/, '').replace(/;$/, '').trim();
+        parsedConfig = JSON.parse(clean);
+      } catch (e) {
+        // Fallback: versuche Objekt-Literal per Function-Parser
+        try {
+          let clean = raw.replace(/^const\s+firebaseConfig\s*=\s*/, '').replace(/;$/, '').trim();
+          parsedConfig = (new Function(`return ${clean}`))();
+        } catch (e2) {
+          alert("Konnte das Konfigurationsobjekt nicht parsen. Bitte überprüfe das Format.");
+          return;
+        }
+      }
+
+      if (parsedConfig && parsedConfig.projectId) {
+        collectionPrefix = prefixVal;
+        localStorage.setItem('hbs_collection_prefix', collectionPrefix);
+        localStorage.setItem('hbs_firebase_config', JSON.stringify(parsedConfig));
+        closeFirebaseConfigModal();
+        showToast("Gespeichert", `Initialisiere Cloud mit Präfix '${collectionPrefix}'...`);
+        initFirebase(parsedConfig);
+      } else {
+        alert("Ungültige Konfiguration: 'projectId' fehlt!");
+      }
+    }
+
+    function clearFirebaseConfig() {
+      localStorage.removeItem('hbs_firebase_config');
+      if (unsubscribeDrinks) unsubscribeDrinks();
+      if (unsubscribeEntries) unsubscribeEntries();
+      closeFirebaseConfigModal();
+      initLocalStorageMode();
+      showToast("Trennt", "Firebase getrennt. Lokaler Speicher aktiv.");
+    }
+
+    async function seedInitialCatalogToCloud(showConfirm = true) {
+      if (!isFirebaseActive || !db) {
+        if (showConfirm) showToast("Nicht verbunden", "Bitte verbinde dich zuerst mit Firebase.");
+        return;
+      }
+      if (showConfirm && !confirm(`Standard-Sortiment in Firestore unter Präfix '${collectionPrefix}' hochladen?`)) return;
+
+      try {
+        const batch = db.batch();
+        DEFAULT_DRINKS.forEach(drink => {
+          const ref = col('drinks').doc(drink.id);
+          batch.set(ref, {
+            name: drink.name,
+            price: drink.price,
+            image: drink.image,
+            unit: drink.unit,
+            restockThreshold: drink.restockThreshold,
+            stock: drink.stock,
+            crateSize: drink.crateSize
+          }, { merge: true });
+        });
+        await batch.commit();
+        if (showConfirm) showToast("Erfolgreich", `Standard-Sortiment wurde in Firebase (${collectionPrefix}drinks) geladen!`);
+      } catch (err) {
+        console.warn("Seed Info:", err);
+        if (showConfirm) showToast("Fehler", "Seed fehlgeschlagen: " + err);
+      }
+    }
+
+    // ==========================================
+    // 9. Exportfunktionen (PDF & CSV) im HBS-Design
+    // ==========================================
     function exportCSV() {
       let csvContent = "data:text/csv;charset=utf-8,Datum;Name;Getraenk;Menge;Einzelpreis;Gesamt;Bezahlt\n";
       entries.forEach(e => {
         const d = DRINKS.find(x => x.id === e.drinkId);
-        const drinkName = d ? d.name : e.drinkId;
+        const drinkName = d ? d.name : (e.drinkName || e.drinkId);
         const line = [
           new Date(e.timestamp).toLocaleString('de-DE'),
           `"${e.name}"`,
@@ -1290,11 +1907,11 @@
       const encodedUri = encodeURI(csvContent);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
-      link.setAttribute("download", `Getraenkefundus_Abrechnung_${new Date().toISOString().slice(0,10)}.csv`);
+      link.setAttribute("download", `Getraenkefundus_HBS_${new Date().toISOString().slice(0,10)}.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      showToast('CSV exportiert', 'Abrechnungsdatei wurde erfolgreich heruntergeladen.');
+      showToast('CSV exportiert', 'Abrechnungsdatei erfolgreich heruntergeladen.');
     }
 
     function exportPDF() {
@@ -1310,7 +1927,7 @@
         format: 'a4'
       });
 
-      // Berechne Salden pro Person
+      // Salden berechnen
       const balances = {};
       entries.forEach(e => {
         if (!balances[e.name]) {
@@ -1324,49 +1941,47 @@
         }
       });
 
-      const names = Object.keys(balances).sort((a, b) => b.localeCompare(a));
       const unpaidEntries = entries.filter(e => !e.paid);
       const totalOwedAll = unpaidEntries.reduce((acc, curr) => acc + curr.total, 0);
 
-      // Farbpalette: Aqua Mist = #789A99 [120, 154, 153], Peach Ice = #FFD2C2 [255, 210, 194]
-      const colorAqua = [120, 154, 153];
-      const colorPeach = [255, 210, 194];
-      const colorDark = [37, 53, 52];
+      // HBS Farben: Cerulean [11, 123, 167], Slate [9, 29, 46], Marigold [243, 146, 0]
+      const colorCerulean = [11, 123, 167];
+      const colorSlate = [9, 29, 46];
+      const colorMarigold = [243, 146, 0];
 
       // Header Banner
-      doc.setFillColor(...colorAqua);
+      doc.setFillColor(...colorCerulean);
       doc.rect(0, 0, 210, 32, 'F');
 
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(18);
-      doc.text('Getränkefundus Lehrerzimmer', 15, 16);
+      doc.text('Getränkefundus Lehrerzimmer • HBS Kahla', 15, 16);
 
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(10);
-      doc.setTextColor(255, 235, 229);
-      doc.text('Abrechnung der offenen Beträge zur Information für das Kollegium', 15, 24);
+      doc.setTextColor(230, 244, 248);
+      doc.text('Abrechnung der offenen Posten zur Information für das Kollegium', 15, 24);
 
-      // Erstellungsdatum / Metadaten
       const dateStr = new Date().toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
       doc.setFontSize(9);
       doc.text(`Stand: ${dateStr}`, 195, 24, { align: 'right' });
 
       // Zusammenfassungsbox
-      doc.setFillColor(255, 246, 243);
-      doc.setDrawColor(...colorPeach);
+      doc.setFillColor(254, 247, 238);
+      doc.setDrawColor(...colorMarigold);
       doc.roundedRect(15, 38, 180, 18, 3, 3, 'FD');
 
-      doc.setTextColor(...colorDark);
+      doc.setTextColor(...colorSlate);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(10);
       doc.text('Gesamtsumme aller offenen Beträge:', 20, 49);
 
       doc.setFontSize(13);
-      doc.setTextColor(180, 70, 50);
+      doc.setTextColor(...colorMarigold);
       doc.text(`${totalOwedAll.toFixed(2).replace('.', ',')} €`, 190, 49, { align: 'right' });
 
-      // Tabellendaten aufbereiten
+      // Tabellendaten
       const tableRows = [];
       const personList = Object.keys(balances).sort((a, b) => balances[b].totalOwed - balances[a].totalOwed);
 
@@ -1392,7 +2007,6 @@
         });
       }
 
-      // Tabelle rendern mit autoTable
       doc.autoTable({
         startY: 62,
         head: [['Kollege / Kollegin', 'Offene Entnahmen (Details)', 'Status', 'Zu zahlen']],
@@ -1402,12 +2016,12 @@
           font: 'helvetica',
           fontSize: 9.5,
           cellPadding: 4,
-          textColor: colorDark,
+          textColor: colorSlate,
           lineColor: [222, 235, 236],
           lineWidth: 0.2
         },
         headStyles: {
-          fillColor: colorAqua,
+          fillColor: colorCerulean,
           textColor: [255, 255, 255],
           fontStyle: 'bold',
           halign: 'left'
@@ -1419,61 +2033,53 @@
           3: { cellWidth: 25, halign: 'right', fontStyle: 'bold' }
         },
         alternateRowStyles: {
-          fillColor: [248, 250, 250]
+          fillColor: [248, 251, 252]
         },
         didParseCell: function(data) {
           if (data.section === 'body' && data.column.index === 3) {
             const rowValue = data.row.raw[3];
             if (rowValue !== '0,00 €') {
-              data.cell.styles.textColor = [190, 60, 40];
+              data.cell.styles.textColor = [217, 119, 6];
             } else {
-              data.cell.styles.textColor = [50, 130, 80];
-            }
-          }
-          if (data.section === 'body' && data.column.index === 2) {
-            const statusVal = data.row.raw[2];
-            if (statusVal === 'Offen') {
-              data.cell.styles.textColor = [190, 60, 40];
-            } else {
-              data.cell.styles.textColor = [50, 130, 80];
+              data.cell.styles.textColor = [0, 168, 150];
             }
           }
         }
       });
 
-      // Fußnoten- / Info-Box zur Bezahlung
       const finalY = doc.lastAutoTable.finalY + 10;
       if (finalY < 265) {
-        doc.setFillColor(242, 247, 247);
-        doc.setDrawColor(...colorAqua);
+        doc.setFillColor(240, 248, 250);
+        doc.setDrawColor(...colorCerulean);
         doc.roundedRect(15, finalY, 180, 18, 2, 2, 'FD');
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(8.5);
-        doc.setTextColor(...colorDark);
+        doc.setTextColor(...colorSlate);
         doc.text('Hinweis für das Kollegium:', 20, finalY + 6);
 
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(8);
-        doc.setTextColor(70, 100, 99);
+        doc.setTextColor(71, 85, 105);
         doc.text('Bitte begleiche deinen offenen Betrag zeitnah bar in die Funduskasse oder beim organisierenden Kollegen.', 20, finalY + 12);
       }
 
-      // Seitennummerierung
       const pageCount = doc.internal.getNumberOfPages();
       for (let i = 1; i <= pageCount; i++) {
         doc.setPage(i);
         doc.setFontSize(8);
         doc.setTextColor(140, 140, 140);
-        doc.text(`Seite ${i} von ${pageCount} • Automatisch erstellt über das Lehrerzimmer-System`, 105, 290, { align: 'center' });
+        doc.text(`Seite ${i} von ${pageCount} • Regelschule Kahla • Getränkefundus-System`, 105, 290, { align: 'center' });
       }
 
-      // Download initiieren
       const fileNameDate = new Date().toISOString().slice(0, 10);
-      doc.save(`Getraenkefundus_Abrechnung_${fileNameDate}.pdf`);
-      showToast('PDF erstellt', 'Die Abrechnung wurde als PDF heruntergeladen.');
+      doc.save(`Getraenkefundus_HBS_Abrechnung_${fileNameDate}.pdf`);
+      showToast('PDF erstellt', 'Abrechnung wurde als PDF heruntergeladen.');
     }
 
+    // ==========================================
+    // 10. Toast Helper
+    // ==========================================
     let toastTimeout;
     function showToast(title, description) {
       const toast = document.getElementById('toast');
