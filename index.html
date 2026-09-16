@@ -643,19 +643,70 @@
           <input type="text" id="edit-drink-name" required placeholder="z. B. Mineralwasser Medium" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs font-semibold">
         </div>
 
-        <!-- Bildauswahl / Preset oder URL -->
+        <!-- Bildauswahl mit Vorschau & kostenloser Getränkebibliothek -->
         <div>
-          <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700 mb-1">Flaschenbild (Pfad oder Preset)</label>
-          <div class="space-y-2">
-            <input type="text" id="edit-drink-image" required placeholder="assets/drinks/wasser.jpg oder Bild-URL" class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs">
-            <div class="text-[11px] text-slate-500">Schnellauswahl Vorlagen:</div>
-            <div class="flex items-center gap-1.5 overflow-x-auto pb-1">
-              <button type="button" onclick="setPresetImage('assets/drinks/wasser.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Wasser</button>
-              <button type="button" onclick="setPresetImage('assets/drinks/apfelschorle.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Schorle</button>
-              <button type="button" onclick="setPresetImage('assets/drinks/saft.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Saft</button>
-              <button type="button" onclick="setPresetImage('assets/drinks/cola.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Cola/Spezi</button>
-              <button type="button" onclick="setPresetImage('assets/drinks/mate.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Mate</button>
-              <button type="button" onclick="setPresetImage('assets/drinks/bionade.jpg')" class="px-2 py-1 bg-slate-100 hover:bg-cerulean-50 rounded-lg text-[10px] font-semibold">Bionade</button>
+          <div class="flex items-center justify-between mb-1">
+            <label class="block text-xs font-bold uppercase tracking-wider text-cerulean-700">Flaschenbild</label>
+            <button type="button" onclick="toggleDrinkLibrary()" class="text-xs text-cerulean hover:text-cerulean-700 font-bold flex items-center gap-1">
+              <i data-lucide="images" class="w-3.5 h-3.5"></i>
+              <span id="library-toggle-text">Bibliothek öffnen</span>
+            </button>
+          </div>
+
+          <!-- Aktive Bild-Vorschau & URL-Input -->
+          <div class="flex gap-3 items-center p-2.5 rounded-2xl border border-slate-200 bg-slate-50 mb-2">
+            <div class="w-14 h-16 bg-white rounded-xl p-1 flex items-center justify-center shrink-0 border border-slate-200 shadow-xs overflow-hidden">
+              <img id="edit-drink-preview-img" src="assets/drinks/wasser.jpg" class="max-h-full max-w-full object-contain" onerror="this.src='assets/drinks/wasser.jpg'">
+            </div>
+            <div class="flex-1 min-w-0">
+              <input type="text" id="edit-drink-image" required oninput="updateDrinkPreview(this.value)" placeholder="Bild-URL oder aus Bibliothek wählen"
+                class="w-full px-3 py-2 rounded-xl border border-slate-200 focus:border-cerulean focus:outline-none text-xs font-mono bg-white">
+              <div class="text-[10px] text-slate-500 mt-1 flex items-center justify-between">
+                <span>Vorschau aktualisiert sich live</span>
+                <button type="button" onclick="toggleDrinkLibrary()" class="text-cerulean font-bold hover:underline">Bibliothek durchsuchen →</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ausklappbare Kostenlose Getränke-Bibliothek -->
+          <div id="drink-library-panel" class="hidden rounded-2xl border border-cerulean-200 bg-cerulean-50/50 p-3 space-y-3 mb-3">
+            <div class="flex flex-col sm:flex-row gap-2 justify-between items-start sm:items-center">
+              <span class="text-xs font-bold text-cerulean-900 flex items-center gap-1.5">
+                <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cerulean"></i>
+                <span>Kostenlose Getränke-Bilder</span>
+              </span>
+              <!-- Suchfeld für Bibliothek -->
+              <div class="relative w-full sm:w-48">
+                <input type="text" id="library-search-input" oninput="filterDrinkLibrary()" placeholder="Filter (z.B. Cola, Saft, Tee)..."
+                  class="w-full text-xs pl-7 pr-2.5 py-1.5 rounded-lg border border-slate-200 bg-white focus:outline-none focus:border-cerulean">
+                <div class="absolute left-2 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none">
+                  <i data-lucide="search" class="w-3 h-3"></i>
+                </div>
+              </div>
+            </div>
+
+            <!-- Kategorie-Tabs -->
+            <div class="flex items-center gap-1 overflow-x-auto pb-1 text-[10px] custom-scrollbar" id="library-category-pills">
+              <button type="button" onclick="filterLibraryCategory('all')" class="lib-cat-btn px-2.5 py-1 rounded-lg font-bold bg-cerulean text-white">Alle</button>
+              <button type="button" onclick="filterLibraryCategory('wasser')" class="lib-cat-btn px-2.5 py-1 rounded-lg font-bold bg-white text-slate-700 hover:bg-cerulean-100">Wasser & Schorle</button>
+              <button type="button" onclick="filterLibraryCategory('softdrinks')" class="lib-cat-btn px-2.5 py-1 rounded-lg font-bold bg-white text-slate-700 hover:bg-cerulean-100">Softdrinks & Limo</button>
+              <button type="button" onclick="filterLibraryCategory('saft')" class="lib-cat-btn px-2.5 py-1 rounded-lg font-bold bg-white text-slate-700 hover:bg-cerulean-100">Säfte & Bio</button>
+              <button type="button" onclick="filterLibraryCategory('kaffee')" class="lib-cat-btn px-2.5 py-1 rounded-lg font-bold bg-white text-slate-700 hover:bg-cerulean-100">Kaffee, Tee & Mate</button>
+              <button type="button" onclick="filterLibraryCategory('specials')" class="lib-cat-btn px-2.5 py-1 rounded-lg font-bold bg-white text-slate-700 hover:bg-cerulean-100">Specials</button>
+            </div>
+
+            <!-- Bilder-Katalog Grid -->
+            <div class="grid grid-cols-3 sm:grid-cols-4 gap-2 max-h-48 overflow-y-auto custom-scrollbar p-1" id="library-items-grid">
+              <!-- Dynamisch via renderDrinkLibrary() -->
+            </div>
+
+            <!-- Wikimedia Web-Suche Button -->
+            <div class="pt-1 flex items-center justify-between border-t border-cerulean-200/60 text-[11px]">
+              <span class="text-slate-500">Nichts passendes dabei?</span>
+              <button type="button" onclick="searchOnlineWikimedia()" class="font-bold text-cerulean hover:underline flex items-center gap-1">
+                <i data-lucide="globe" class="w-3 h-3"></i>
+                <span>Im Web suchen (Wikimedia Commons)</span>
+              </button>
             </div>
           </div>
         </div>
@@ -1558,8 +1609,170 @@
       showToast('Bestand aktualisiert', `${drink.name}: Jetzt ${newStock} Flaschen.`);
     }
 
-    function setPresetImage(path) {
-      document.getElementById('edit-drink-image').value = path;
+    // ==========================================
+    // Kostenlose Getränke-Bildbibliothek & Online-Suche
+    // ==========================================
+    const BEVERAGE_LIBRARY = [
+      // Wasser & Schorle
+      { name: 'Mineralwasser Medium', category: 'wasser', url: 'assets/drinks/wasser.jpg' },
+      { name: 'Mineralwasser Spritzig', category: 'wasser', url: 'https://images.unsplash.com/photo-1548839140-29a749e1bc4e?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Wasser Still', category: 'wasser', url: 'https://images.unsplash.com/photo-1523362628745-0c100150b504?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Apfelschorle Naturtrüb', category: 'wasser', url: 'assets/drinks/apfelschorle.jpg' },
+      { name: 'Rhabarberschorle', category: 'wasser', url: 'https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=500&auto=format&fit=crop&q=80' },
+
+      // Softdrinks & Limo
+      { name: 'Cola / Spezi Mix', category: 'softdrinks', url: 'assets/drinks/cola.jpg' },
+      { name: 'Bio-Limonade Zitrone', category: 'softdrinks', url: 'assets/drinks/bionade.jpg' },
+      { name: 'Orangenlimonade (Fanta-Style)', category: 'softdrinks', url: 'https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Zitronenlimo (Sprite-Style)', category: 'softdrinks', url: 'https://images.unsplash.com/photo-1581006852262-e4307cf6283a?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Fassbrause Zitrone', category: 'softdrinks', url: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Cola Zero / Light', category: 'softdrinks', url: 'https://images.unsplash.com/photo-1554866585-cd94860890b7?w=500&auto=format&fit=crop&q=80' },
+
+      // Säfte & Bio
+      { name: 'Orangensaft / Mehrfrucht', category: 'saft', url: 'assets/drinks/saft.jpg' },
+      { name: 'Apfelsaft Klar', category: 'saft', url: 'https://images.unsplash.com/photo-1576673442511-7e39b6545c87?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Multivitaminsaft', category: 'saft', url: 'https://images.unsplash.com/photo-1613478223719-2ab802602423?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Traubensaft Rot', category: 'saft', url: 'https://images.unsplash.com/photo-1560512823-829485b8bf24?w=500&auto=format&fit=crop&q=80' },
+
+      // Kaffee, Tee & Mate
+      { name: 'Club-Mate / Eistee', category: 'kaffee', url: 'assets/drinks/mate.jpg' },
+      { name: 'Eistee Pfirsich', category: 'kaffee', url: 'https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Eistee Zitrone', category: 'kaffee', url: 'https://images.unsplash.com/photo-1499638673689-79a0b5115d87?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Kaffee / Espresso', category: 'kaffee', url: 'https://images.unsplash.com/photo-1514432324607-a09d9b4aefdd?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Eiskaffee / Frappé', category: 'kaffee', url: 'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?w=500&auto=format&fit=crop&q=80' },
+
+      // Specials
+      { name: 'Energy Drink', category: 'specials', url: 'https://images.unsplash.com/photo-1622543925917-763c34d1a86e?w=500&auto=format&fit=crop&q=80' },
+      { name: 'Malzbier Alkoholfrei', category: 'specials', url: 'https://images.unsplash.com/photo-1608270191778-98e3b392e21b?w=500&auto=format&fit=crop&q=80' }
+    ];
+
+    let currentLibraryCategory = 'all';
+    let currentLibraryResults = [...BEVERAGE_LIBRARY];
+
+    function updateDrinkPreview(url) {
+      const previewEl = document.getElementById('edit-drink-preview-img');
+      if (previewEl && url) {
+        previewEl.src = url;
+      }
+    }
+
+    function toggleDrinkLibrary() {
+      const panel = document.getElementById('drink-library-panel');
+      const toggleText = document.getElementById('library-toggle-text');
+      if (!panel) return;
+      const isHidden = panel.classList.contains('hidden');
+      if (isHidden) {
+        panel.classList.remove('hidden');
+        if (toggleText) toggleText.textContent = 'Bibliothek schließen';
+        renderDrinkLibrary();
+      } else {
+        panel.classList.add('hidden');
+        if (toggleText) toggleText.textContent = 'Bibliothek öffnen';
+      }
+      initIcons();
+    }
+
+    function filterLibraryCategory(cat) {
+      currentLibraryCategory = cat;
+      const buttons = document.querySelectorAll('.lib-cat-btn');
+      buttons.forEach(btn => {
+        btn.className = 'lib-cat-btn px-2.5 py-1 rounded-lg font-bold bg-white text-slate-700 hover:bg-cerulean-100';
+      });
+      if (window.event && window.event.target) {
+        window.event.target.classList.remove('bg-white', 'text-slate-700', 'hover:bg-cerulean-100');
+        window.event.target.classList.add('bg-cerulean', 'text-white');
+      }
+      filterDrinkLibrary();
+    }
+
+    function filterDrinkLibrary() {
+      const search = (document.getElementById('library-search-input')?.value || '').toLowerCase();
+      currentLibraryResults = BEVERAGE_LIBRARY.filter(item => {
+        const matchesCat = currentLibraryCategory === 'all' || item.category === currentLibraryCategory;
+        const matchesSearch = item.name.toLowerCase().includes(search);
+        return matchesCat && matchesSearch;
+      });
+      renderDrinkLibrary();
+    }
+
+    function renderDrinkLibrary() {
+      const grid = document.getElementById('library-items-grid');
+      if (!grid) return;
+      if (currentLibraryResults.length === 0) {
+        grid.innerHTML = `
+          <div class="col-span-full py-4 text-center text-slate-500 text-xs">
+            Keine Vorlage gefunden. Klicke unten auf <em>"Im Web suchen"</em> für mehr Ergebnisse.
+          </div>
+        `;
+        return;
+      }
+
+      const activeUrl = document.getElementById('edit-drink-image')?.value || '';
+
+      grid.innerHTML = currentLibraryResults.map(item => {
+        const isSelected = activeUrl === item.url;
+        return `
+          <button type="button" onclick="selectLibraryImage('${item.url.replace(/'/g, "\\'")}')"
+            class="group p-1.5 rounded-xl border flex flex-col items-center justify-between text-center transition bg-white ${
+              isSelected ? 'border-cerulean ring-2 ring-cerulean/30 shadow-xs' : 'border-slate-200 hover:border-cerulean-300 hover:shadow-xs'
+            }">
+            <div class="w-full h-16 flex items-center justify-center p-0.5 overflow-hidden mb-1">
+              <img src="${item.url}" alt="${item.name}" class="max-h-full max-w-full object-contain group-hover:scale-105 transition duration-150" onerror="this.src='assets/drinks/wasser.jpg'">
+            </div>
+            <span class="text-[10px] font-bold text-slate-800 line-clamp-1 leading-tight">${item.name}</span>
+          </button>
+        `;
+      }).join('');
+    }
+
+    function selectLibraryImage(url) {
+      document.getElementById('edit-drink-image').value = url;
+      updateDrinkPreview(url);
+      renderDrinkLibrary();
+      showToast('Bild gewählt', 'Flaschenbild wurde in das Formular übernommen.');
+    }
+
+    async function searchOnlineWikimedia() {
+      const search = (document.getElementById('library-search-input')?.value || document.getElementById('edit-drink-name')?.value || 'beverage').trim();
+      const grid = document.getElementById('library-items-grid');
+      if (!grid) return;
+
+      grid.innerHTML = `
+        <div class="col-span-full py-6 text-center text-cerulean font-semibold text-xs flex items-center justify-center gap-2">
+          <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i>
+          <span>Suche kostenlose Bilder zu "${search}"...</span>
+        </div>
+      `;
+      initIcons();
+
+      try {
+        const apiUrl = `https://commons.wikimedia.org/w/api.php?action=query&generator=search&gsrsearch=${encodeURIComponent(search)}+bottle+filetype:bitmap&gsrnamespace=6&prop=imageinfo&iiprop=url|thumburl&iiurlwidth=300&format=json&origin=*`;
+        const res = await fetch(apiUrl);
+        const data = await res.json();
+
+        if (data && data.query && data.query.pages) {
+          const pages = Object.values(data.query.pages);
+          const results = pages.map(p => {
+            const info = p.imageinfo && p.imageinfo[0];
+            return {
+              name: p.title.replace(/^File:/, '').replace(/\.[^/.]+$/, '').replace(/_/g, ' '),
+              url: info ? (info.thumburl || info.url) : null
+            };
+          }).filter(x => x.url && !x.url.endsWith('.svg'));
+
+          if (results.length > 0) {
+            currentLibraryResults = results;
+            renderDrinkLibrary();
+            showToast('Ergebnisse geladen', `${results.length} kostenlose Web-Bilder gefunden.`);
+            return;
+          }
+        }
+
+        grid.innerHTML = `<div class="col-span-full py-4 text-center text-slate-500 text-xs">Keine Web-Bilder zu "${search}" gefunden.</div>`;
+      } catch (err) {
+        console.error("Wikimedia Search Error:", err);
+        grid.innerHTML = `<div class="col-span-full py-4 text-center text-rose-500 text-xs">Suche fehlgeschlagen: ${err.message || err}</div>`;
+      }
     }
 
     function openAddDrinkModal() {
@@ -1567,11 +1780,18 @@
       document.getElementById('edit-drink-id').value = '';
       document.getElementById('edit-drink-name').value = '';
       document.getElementById('edit-drink-image').value = 'assets/drinks/wasser.jpg';
+      updateDrinkPreview('assets/drinks/wasser.jpg');
       document.getElementById('edit-drink-unit').value = '0,5L Glasflasche';
       document.getElementById('edit-drink-price').value = '1.00';
       document.getElementById('edit-drink-crate').value = '20';
       document.getElementById('edit-drink-stock').value = '20';
       document.getElementById('edit-drink-threshold').value = '6';
+
+      // Bibliothek eingeklappt starten
+      const panel = document.getElementById('drink-library-panel');
+      if (panel) panel.classList.add('hidden');
+      const toggleText = document.getElementById('library-toggle-text');
+      if (toggleText) toggleText.textContent = 'Bibliothek öffnen';
 
       document.getElementById('drink-edit-modal').classList.remove('hidden');
       initIcons();
@@ -1584,12 +1804,20 @@
       document.getElementById('drink-edit-modal-title').textContent = `${drink.name} bearbeiten`;
       document.getElementById('edit-drink-id').value = drink.id;
       document.getElementById('edit-drink-name').value = drink.name;
-      document.getElementById('edit-drink-image').value = drink.image || 'assets/drinks/wasser.jpg';
+      const imgUrl = drink.image || 'assets/drinks/wasser.jpg';
+      document.getElementById('edit-drink-image').value = imgUrl;
+      updateDrinkPreview(imgUrl);
       document.getElementById('edit-drink-unit').value = drink.unit;
       document.getElementById('edit-drink-price').value = drink.price.toFixed(2);
       document.getElementById('edit-drink-crate').value = drink.crateSize || 20;
       document.getElementById('edit-drink-stock').value = drink.stock;
       document.getElementById('edit-drink-threshold').value = drink.restockThreshold;
+
+      // Bibliothek eingeklappt starten
+      const panel = document.getElementById('drink-library-panel');
+      if (panel) panel.classList.add('hidden');
+      const toggleText = document.getElementById('library-toggle-text');
+      if (toggleText) toggleText.textContent = 'Bibliothek öffnen';
 
       document.getElementById('drink-edit-modal').classList.remove('hidden');
       initIcons();
