@@ -1,0 +1,30 @@
+{
+  "name": "Getränkefundus • Regelschule Kahla",
+  "short_name": "Getränke HBS",
+  "description": "Digitale Vertrauenskasse und Vorratsverwaltung für das Lehrerzimmer der Regelschule Kahla",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#F8FBFC",
+  "theme_color": "#0B7BA7",
+  "icons": [
+    {
+      "src": "assets/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "assets/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/icons/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}
